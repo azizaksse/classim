@@ -3,64 +3,13 @@ import ProductCard from './ProductCard';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-
-const featuredProducts = [
-  {
-    id: '1',
-    nameAr: 'كوستيم كلاسيكي أسود',
-    nameFr: 'Costume Classique Noir',
-    images: [
-      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800',
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800',
-    ],
-    rentPrice: 8000,
-    salePrice: 35000,
-    sizes: ['S', 'M', 'L', 'XL'],
-    category: 'costumes',
-  },
-  {
-    id: '2',
-    nameAr: 'كوستيم أزرق ملكي',
-    nameFr: 'Costume Bleu Royal',
-    images: [
-      'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?q=80&w=800',
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800',
-    ],
-    rentPrice: 9000,
-    salePrice: 40000,
-    sizes: ['M', 'L', 'XL'],
-    category: 'costumes',
-  },
-  {
-    id: '3',
-    nameAr: 'كوستيم بيج فاخر',
-    nameFr: 'Costume Beige Premium',
-    images: [
-      'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800',
-      'https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?q=80&w=800',
-    ],
-    rentPrice: 10000,
-    salePrice: 45000,
-    sizes: ['S', 'M', 'L'],
-    category: 'costumes',
-  },
-  {
-    id: '4',
-    nameAr: 'كوستيم رمادي عصري',
-    nameFr: 'Costume Gris Moderne',
-    images: [
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800',
-      'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?q=80&w=800',
-    ],
-    rentPrice: 8500,
-    salePrice: 38000,
-    sizes: ['M', 'L', 'XL'],
-    category: 'costumes',
-  },
-];
+import { products } from '@/data/products';
 
 const FeaturedProducts = () => {
   const { language, t, dir } = useLanguage();
+
+  // Get first 4 products for featured section
+  const featuredProducts = products.slice(0, 4);
 
   return (
     <section className="py-20 bg-background">

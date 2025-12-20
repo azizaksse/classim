@@ -1,36 +1,47 @@
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import CategoryCard from './CategoryCard';
+import { categories } from '@/data/products';
 
-const categories = [
-  {
-    id: 'costumes',
-    nameAr: 'كوستيم',
-    nameFr: 'Costumes',
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800',
-    count: 24,
-  },
-  {
-    id: 'show',
-    nameAr: 'شو',
-    nameFr: 'Show',
-    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800',
-    count: 12,
-  },
-  {
-    id: 'tshirts',
-    nameAr: 'تيشيرت',
-    nameFr: 'T-shirts',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800',
-    count: 18,
-  },
-  {
-    id: 'accessories',
-    nameAr: 'إكسسوارات',
-    nameFr: 'Accessoires',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800',
-    count: 32,
-  },
-];
+interface CategoryCardProps {
+  id: string;
+  nameAr: string;
+  nameFr: string;
+  image: string;
+  count: number;
+}
+
+const CategoryCard = ({ id, nameAr, nameFr, image, count }: CategoryCardProps) => {
+  const { language } = useLanguage();
+
+  return (
+    <Link 
+      to={`/catalogue?category=${id}`}
+      className="group relative overflow-hidden rounded-2xl aspect-[4/5] hover-lift"
+    >
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+        style={{ backgroundImage: `url(${image})` }}
+      />
+      
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-300" />
+      
+      {/* Gold Border on Hover */}
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/50 rounded-2xl transition-colors duration-300" />
+
+      {/* Content */}
+      <div className="absolute inset-0 flex flex-col justify-end p-6">
+        <h3 className={`text-2xl font-bold text-foreground mb-2 ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+          {language === 'ar' ? nameAr : nameFr}
+        </h3>
+        <p className="text-sm text-primary">
+          {count} {language === 'ar' ? 'منتج' : 'produits'}
+        </p>
+      </div>
+    </Link>
+  );
+};
 
 const Categories = () => {
   const { language, t } = useLanguage();

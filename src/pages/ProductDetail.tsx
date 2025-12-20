@@ -8,40 +8,7 @@ import SizeCalculator from '@/components/SizeCalculator';
 import LeadForm from '@/components/LeadForm';
 import { Button } from '@/components/ui/button';
 import { Truck, CreditCard, ArrowLeft, ArrowRight } from 'lucide-react';
-
-const allProducts = [
-  {
-    id: '1',
-    nameAr: 'كوستيم كلاسيكي أسود',
-    nameFr: 'Costume Classique Noir',
-    descriptionAr: 'كوستيم أسود كلاسيكي فاخر مصنوع من أجود أنواع الأقمشة. مثالي للأعراس والمناسبات الرسمية.',
-    descriptionFr: 'Costume noir classique luxueux fabriqué avec les meilleurs tissus. Parfait pour les mariages et occasions formelles.',
-    images: [
-      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800',
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800',
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800',
-    ],
-    rentPrice: 8000,
-    salePrice: 35000,
-    sizes: ['S', 'M', 'L', 'XL'],
-    category: 'costumes',
-  },
-  {
-    id: '2',
-    nameAr: 'كوستيم أزرق ملكي',
-    nameFr: 'Costume Bleu Royal',
-    descriptionAr: 'كوستيم أزرق ملكي أنيق يضفي لمسة من الفخامة والتميز. تصميم عصري بقصة مثالية.',
-    descriptionFr: 'Costume bleu royal élégant qui ajoute une touche de luxe et de distinction. Design moderne avec une coupe parfaite.',
-    images: [
-      'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?q=80&w=800',
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800',
-    ],
-    rentPrice: 9000,
-    salePrice: 40000,
-    sizes: ['M', 'L', 'XL'],
-    category: 'costumes',
-  },
-];
+import { products } from '@/data/products';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -49,7 +16,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
-  const product = allProducts.find(p => p.id === id);
+  const product = products.find(p => p.id === id);
 
   if (!product) {
     return (

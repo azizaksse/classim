@@ -6,121 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
-
-const allProducts = [
-  {
-    id: '1',
-    nameAr: 'كوستيم كلاسيكي أسود',
-    nameFr: 'Costume Classique Noir',
-    images: [
-      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800',
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800',
-    ],
-    rentPrice: 8000,
-    salePrice: 35000,
-    sizes: ['S', 'M', 'L', 'XL'],
-    category: 'costumes',
-  },
-  {
-    id: '2',
-    nameAr: 'كوستيم أزرق ملكي',
-    nameFr: 'Costume Bleu Royal',
-    images: [
-      'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?q=80&w=800',
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800',
-    ],
-    rentPrice: 9000,
-    salePrice: 40000,
-    sizes: ['M', 'L', 'XL'],
-    category: 'costumes',
-  },
-  {
-    id: '3',
-    nameAr: 'كوستيم بيج فاخر',
-    nameFr: 'Costume Beige Premium',
-    images: [
-      'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800',
-      'https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?q=80&w=800',
-    ],
-    rentPrice: 10000,
-    salePrice: 45000,
-    sizes: ['S', 'M', 'L'],
-    category: 'costumes',
-  },
-  {
-    id: '4',
-    nameAr: 'كوستيم رمادي عصري',
-    nameFr: 'Costume Gris Moderne',
-    images: [
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=800',
-      'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?q=80&w=800',
-    ],
-    rentPrice: 8500,
-    salePrice: 38000,
-    sizes: ['M', 'L', 'XL'],
-    category: 'costumes',
-  },
-  {
-    id: '5',
-    nameAr: 'شو أبيض فاخر',
-    nameFr: 'Show Blanc Luxe',
-    images: [
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800',
-      'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800',
-    ],
-    rentPrice: 12000,
-    salePrice: 55000,
-    sizes: ['M', 'L'],
-    category: 'show',
-  },
-  {
-    id: '6',
-    nameAr: 'شو ذهبي',
-    nameFr: 'Show Doré',
-    images: [
-      'https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=800',
-      'https://images.unsplash.com/photo-1598808503746-f34c53b9323e?q=80&w=800',
-    ],
-    rentPrice: 15000,
-    salePrice: 65000,
-    sizes: ['S', 'M', 'L', 'XL'],
-    category: 'show',
-  },
-  {
-    id: '7',
-    nameAr: 'تيشيرت أسود كلاسيك',
-    nameFr: 'T-shirt Noir Classic',
-    images: [
-      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800',
-      'https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=800',
-    ],
-    rentPrice: 2000,
-    salePrice: 8000,
-    sizes: ['S', 'M', 'L', 'XL'],
-    category: 'tshirts',
-  },
-  {
-    id: '8',
-    nameAr: 'ربطة عنق حريرية',
-    nameFr: 'Cravate en Soie',
-    images: [
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800',
-      'https://images.unsplash.com/photo-1589756823695-278bc923f962?q=80&w=800',
-    ],
-    rentPrice: 1500,
-    salePrice: 5000,
-    sizes: ['Unique'],
-    category: 'accessories',
-  },
-];
-
-const categories = [
-  { id: 'all', nameAr: 'الكل', nameFr: 'Tout' },
-  { id: 'costumes', nameAr: 'كوستيم', nameFr: 'Costumes' },
-  { id: 'show', nameAr: 'شو', nameFr: 'Show' },
-  { id: 'tshirts', nameAr: 'تيشيرت', nameFr: 'T-shirts' },
-  { id: 'accessories', nameAr: 'إكسسوارات', nameFr: 'Accessoires' },
-];
+import { products, categories } from '@/data/products';
 
 const Catalogue = () => {
   const { language, t } = useLanguage();
@@ -128,8 +14,8 @@ const Catalogue = () => {
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
 
   const filteredProducts = activeCategory === 'all'
-    ? allProducts
-    : allProducts.filter(p => p.category === activeCategory);
+    ? products
+    : products.filter(p => p.category === activeCategory);
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -140,6 +26,11 @@ const Catalogue = () => {
     }
     setSearchParams(searchParams);
   };
+
+  const allCategories = [
+    { id: 'all', nameAr: 'الكل', nameFr: 'Tout' },
+    ...categories,
+  ];
 
   const title = language === 'ar'
     ? 'الكتالوج | كلاسيمو'
@@ -171,7 +62,7 @@ const Catalogue = () => {
 
             {/* Filters */}
             <div className="flex flex-wrap justify-center gap-2 mb-12">
-              {categories.map((cat) => (
+              {allCategories.map((cat) => (
                 <Button
                   key={cat.id}
                   variant={activeCategory === cat.id ? 'gold' : 'premium'}
