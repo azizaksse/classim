@@ -24,32 +24,34 @@ const Index = () => {
     : 'Modèles premium de costumes de mariage en location et vente. Livraison nationale en Algérie. Paiement à la livraison.';
 
   return (
-    <PageTransition>
-      <Helmet>
-        <html lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'} />
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-      </Helmet>
+    <>
+      <Navbar />
+      <PageTransition>
+        <Helmet>
+          <html lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'} />
+          <title>{title}</title>
+          <meta name="description" content={description} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="og:type" content="website" />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={title} />
+          <meta name="twitter:description" content={description} />
+        </Helmet>
 
-      <main className="min-h-screen bg-background">
-        <Navbar />
-        <Hero />
-        <TrustBadges />
-        <SizeCalculator />
-        <Categories />
-        <FeaturedProducts />
-        <Testimonials />
-        <InstagramFeed />
-        <CTASection />
-        <Footer />
-      </main>
-    </PageTransition>
+        <main className="min-h-screen bg-background">
+          <Hero />
+          <TrustBadges />
+          <SizeCalculator />
+          <Categories />
+          <FeaturedProducts />
+          <Testimonials />
+          <InstagramFeed />
+          <CTASection />
+          <Footer />
+        </main>
+      </PageTransition>
+    </>
   );
 };
 

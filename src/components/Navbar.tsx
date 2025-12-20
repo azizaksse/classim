@@ -40,16 +40,19 @@ const Navbar = () => {
 
   return (
     <motion.nav 
-      className={`fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-4xl transition-all duration-500 ${
-        scrolled 
-          ? 'bg-card/95 shadow-elegant border border-border/60' 
-          : 'bg-card/80 border border-border/40'
-      } backdrop-blur-xl rounded-2xl`}
+      className="fixed top-3 md:top-4 inset-x-0 z-50 px-3 md:px-4"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
-      <div className="px-4 md:px-6">
+      <div
+        className={`mx-auto w-full max-w-4xl transition-all duration-500 ${
+          scrolled 
+            ? 'bg-card/95 shadow-elegant border border-border/60' 
+            : 'bg-card/80 border border-border/40'
+        } backdrop-blur-xl rounded-2xl`}
+      >
+        <div className="px-4 md:px-6">
         <div className="grid grid-cols-3 items-center h-14 md:h-16">
           {/* Actions - Left in LTR, Right in RTL */}
           <div className="flex items-center gap-2 md:gap-3 justify-start">
@@ -211,7 +214,8 @@ const Navbar = () => {
           )}
         </AnimatePresence>
       </div>
-    </motion.nav>
+    </div>
+  </motion.nav>
   );
 };
 
