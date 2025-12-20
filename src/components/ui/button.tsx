@@ -19,7 +19,7 @@ const buttonVariants = cva(
         gold: "bg-gradient-to-r from-gold to-gold-dark text-primary-foreground font-semibold shadow-gold hover:shadow-elegant hover:from-gold-light hover:to-gold hover:scale-[1.02] active:scale-[0.98]",
         goldOutline: "border-2 border-gold text-foreground hover:bg-gold hover:text-primary-foreground font-semibold",
         premium: "bg-card border border-border text-foreground hover:border-gold hover:text-gold font-medium",
-        whatsapp: "bg-whatsapp text-primary-foreground font-semibold hover:bg-whatsapp-hover shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
+        whatsapp: "bg-gradient-to-r from-whatsapp to-whatsapp-hover text-primary-foreground font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] hover:from-whatsapp-hover hover:to-whatsapp",
       },
       size: {
         default: "h-10 px-4 py-2",
