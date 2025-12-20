@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Star, Quote } from 'lucide-react';
-import { useState } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
 
 const testimonials = [
@@ -206,7 +205,6 @@ const TestimonialCard = ({ testimonial, language }: TestimonialCardProps) => {
 
 const Testimonials = () => {
   const { language } = useLanguage();
-  const [isHovered, setIsHovered] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -228,10 +226,8 @@ const Testimonials = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <AnimatedSection className="text-center mb-12">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
-            <span className="text-gradient-gold">
-              {language === 'ar' ? 'آراء زبائننا' : 'Avis de nos clients'}
-            </span>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 text-white ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+            {language === 'ar' ? 'آراء زبائننا' : 'Avis de nos clients'}
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
             {language === 'ar'
@@ -241,42 +237,54 @@ const Testimonials = () => {
         </AnimatedSection>
       </div>
 
-      {/* Scrolling Testimonials */}
-      <div 
-        className="relative"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Gradient Masks */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-        
-        {/* Infinite Scroll Track */}
-        <div className="overflow-hidden">
-          <div
-            className="flex gap-6"
-            style={{
-              animation: `marquee ${isHovered ? '60s' : '25s'} linear infinite`,
-              width: 'fit-content',
-            }}
-          >
-            {/* First set */}
-            {testimonials.map((testimonial) => (
-              <TestimonialCard
-                key={`first-${testimonial.id}`}
-                testimonial={testimonial}
-                language={language}
-              />
-            ))}
-            {/* Duplicate set for seamless loop */}
-            {testimonials.map((testimonial) => (
-              <TestimonialCard
-                key={`second-${testimonial.id}`}
-                testimonial={testimonial}
-                language={language}
-              />
-            ))}
-          </div>
+      {/* Static Testimonials Grid */}
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.slice(0, 6).map((testimonial, index) => (
+            <motion.div
+              key={testimonial.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
+            >
+              <div className="glass-card rounded-2xl p-6 h-full relative">
+                {/* Quote Icon */}
+                <div className="absolute top-4 end-4 opacity-10">
+                  <Quote className="w-10 h-10 text-primary" />
+                </div>
+
+                {/* Rating */}
+                <div className="mb-4">
+                  <StarRating rating={testimonial.rating} />
+                </div>
+
+                {/* Review Text */}
+                <p className="text-foreground text-sm leading-relaxed mb-6">
+                  {language === 'ar' ? testimonial.reviewAr : testimonial.reviewFr}
+                </p>
+
+                {/* Customer Info */}
+                <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+                    <img
+                      src={testimonial.image}
+                      alt={language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h4 className={`font-semibold text-foreground text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
+                      {language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      {language === 'ar' ? testimonial.locationAr : testimonial.locationFr}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 

@@ -151,8 +151,8 @@ Wilaya: ${wilayaName}`;
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
-              <span className="text-gradient-gold">{t('size.title')}</span>
+            <h2 className={`text-3xl md:text-4xl font-bold mb-4 text-white ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+              {t('size.title')}
             </h2>
             <p className="text-muted-foreground">
               {t('size.subtitle')}
