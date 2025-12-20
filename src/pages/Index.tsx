@@ -6,6 +6,7 @@ import TrustBadges from '@/components/TrustBadges';
 import SizeCalculator from '@/components/SizeCalculator';
 import Categories from '@/components/Categories';
 import FeaturedProducts from '@/components/FeaturedProducts';
+import InstagramFeed from '@/components/InstagramFeed';
 import CTASection from '@/components/CTASection';
 import Footer from '@/components/Footer';
 
@@ -41,6 +42,7 @@ const Index = () => {
         <SizeCalculator />
         <Categories />
         <FeaturedProducts />
+        <InstagramFeed />
         <CTASection />
         <Footer />
       </main>
