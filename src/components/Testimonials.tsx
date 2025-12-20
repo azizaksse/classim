@@ -1,5 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Star, Quote } from 'lucide-react';
+import { useRef, useState } from 'react';
 
 const testimonials = [
   {
@@ -46,6 +47,28 @@ const testimonials = [
     rating: 4,
     image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200',
   },
+  {
+    id: '5',
+    nameAr: 'كريم مسعود',
+    nameFr: 'Karim Massoud',
+    locationAr: 'عنابة',
+    locationFr: 'Annaba',
+    reviewAr: 'تشكيلة واسعة من الموديلات. اخترت كوستيم أزرق ملكي وكان مذهلاً. خدمة عملاء ممتازة.',
+    reviewFr: "Large choix de modèles. J'ai choisi un costume bleu royal et il était magnifique. Excellent service client.",
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200',
+  },
+  {
+    id: '6',
+    nameAr: 'سمير بلقاسم',
+    nameFr: 'Samir Belkacem',
+    locationAr: 'تلمسان',
+    locationFr: 'Tlemcen',
+    reviewAr: 'التوصيل كان سريع جداً. الكوستيم وصل في حالة ممتازة. شكراً كلاسيمو!',
+    reviewFr: "La livraison était très rapide. Le costume est arrivé en excellent état. Merci Classimo !",
+    rating: 5,
+    image: 'https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=200',
+  },
 ];
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -65,11 +88,61 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
+interface TestimonialCardProps {
+  testimonial: typeof testimonials[0];
+  language: 'ar' | 'fr';
+}
+
+const TestimonialCard = ({ testimonial, language }: TestimonialCardProps) => {
+  return (
+    <div className="glass-card rounded-2xl p-6 min-w-[300px] md:min-w-[350px] relative flex-shrink-0">
+      {/* Quote Icon */}
+      <div className="absolute top-4 end-4 opacity-10">
+        <Quote className="w-10 h-10 text-primary" />
+      </div>
+
+      {/* Rating */}
+      <div className="mb-4">
+        <StarRating rating={testimonial.rating} />
+      </div>
+
+      {/* Review Text */}
+      <p className="text-foreground text-sm leading-relaxed mb-6 line-clamp-4">
+        {language === 'ar' ? testimonial.reviewAr : testimonial.reviewFr}
+      </p>
+
+      {/* Customer Info */}
+      <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
+          <img
+            src={testimonial.image}
+            alt={language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div>
+          <h4 className={`font-semibold text-foreground text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
+            {language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
+          </h4>
+          <p className="text-xs text-muted-foreground">
+            {language === 'ar' ? testimonial.locationAr : testimonial.locationFr}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Testimonials = () => {
   const { language } = useLanguage();
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Double the testimonials for seamless loop
+  const duplicatedTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-background overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
@@ -84,52 +157,37 @@ const Testimonials = () => {
               : 'Découvrez les expériences de nos clients satisfaits'}
           </p>
         </div>
+      </div>
 
-        {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={testimonial.id}
-              className="glass-card rounded-2xl p-6 hover-lift animate-fade-in relative"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* Quote Icon */}
-              <div className="absolute top-4 end-4 opacity-10">
-                <Quote className="w-10 h-10 text-primary" />
-              </div>
-
-              {/* Rating */}
-              <div className="mb-4">
-                <StarRating rating={testimonial.rating} />
-              </div>
-
-              {/* Review Text */}
-              <p className="text-foreground text-sm leading-relaxed mb-6 line-clamp-4">
-                {language === 'ar' ? testimonial.reviewAr : testimonial.reviewFr}
-              </p>
-
-              {/* Customer Info */}
-              <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
-                  <img
-                    src={testimonial.image}
-                    alt={language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h4 className={`font-semibold text-foreground text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
-                    {language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    {language === 'ar' ? testimonial.locationAr : testimonial.locationFr}
-                  </p>
-                </div>
-              </div>
-            </div>
+      {/* Scrolling Testimonials */}
+      <div 
+        className="relative"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Gradient Masks */}
+        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        
+        {/* Scrolling Container */}
+        <div
+          ref={scrollRef}
+          className={`flex gap-6 ${isPaused ? 'animate-scroll-slow' : 'animate-scroll'}`}
+          style={{
+            width: 'max-content',
+          }}
+        >
+          {duplicatedTestimonials.map((testimonial, index) => (
+            <TestimonialCard
+              key={`${testimonial.id}-${index}`}
+              testimonial={testimonial}
+              language={language}
+            />
           ))}
         </div>
+      </div>
 
+      <div className="container mx-auto px-4">
         {/* Stats */}
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
