@@ -52,6 +52,10 @@ export default {
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
         },
+        whatsapp: {
+          DEFAULT: "hsl(var(--whatsapp))",
+          hover: "hsl(var(--whatsapp-hover))",
+        },
         champagne: "hsl(var(--champagne))",
         ivory: "hsl(var(--ivory))",
         obsidian: "hsl(var(--obsidian))",

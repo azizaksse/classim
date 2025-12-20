@@ -46,6 +46,10 @@
     --ivory: 40 30% 96%;
     --obsidian: 30 10% 4%;
     --charcoal: 30 8% 12%;
+    
+    /* WhatsApp Brand Color */
+    --whatsapp: 142 70% 49%;
+    --whatsapp-hover: 142 70% 44%;
 
     /* CTA Gradient - Vibrant Yellow Gold */
     --cta-gold-from: 45 85% 55%;

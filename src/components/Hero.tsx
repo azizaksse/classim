@@ -66,7 +66,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <span className="text-white">{t('hero.title')}</span>
+            <span className="text-foreground">{t('hero.title')}</span>
           </motion.h1>
 
           {/* Subtitle */}

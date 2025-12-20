@@ -61,7 +61,7 @@ const Navbar = () => {
               href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3 md:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/20"
+              className="hidden sm:flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-3 md:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -201,7 +201,7 @@ const Navbar = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-4 py-3 rounded-xl font-medium transition-all duration-300"
+                  className="flex items-center justify-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-4 py-3 rounded-xl font-medium transition-all duration-300"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}

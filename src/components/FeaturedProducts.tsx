@@ -18,7 +18,7 @@ const FeaturedProducts = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <AnimatedSection className="flex items-center justify-between mb-12">
-          <h2 className={`text-3xl md:text-4xl font-bold text-white ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+          <h2 className={`text-3xl md:text-4xl font-bold text-foreground ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
             {language === 'ar' ? 'الأكثر طلباً' : 'Les plus demandés'}
           </h2>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

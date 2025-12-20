@@ -58,7 +58,7 @@ const Catalogue = () => {
             <div className="container mx-auto px-4">
               {/* Header */}
               <AnimatedSection className="text-center mb-12">
-                <h1 className={`text-4xl md:text-5xl font-bold mb-4 text-white ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+                <h1 className={`text-4xl md:text-5xl font-bold mb-4 text-foreground ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
                   {t('nav.catalogue')}
                 </h1>
               </AnimatedSection>

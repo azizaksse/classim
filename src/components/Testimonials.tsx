@@ -226,7 +226,7 @@ const Testimonials = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <AnimatedSection className="text-center mb-12">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-4 text-white ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 text-foreground ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
             {language === 'ar' ? 'آراء زبائننا' : 'Avis de nos clients'}
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">

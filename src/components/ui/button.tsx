@@ -15,11 +15,11 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // Premium variants - Vibrant Yellow Gold with White Text
-        gold: "bg-gradient-to-r from-[hsl(45,85%,55%)] to-[hsl(42,80%,48%)] text-white font-semibold shadow-[0_4px_20px_-4px_hsl(45,85%,55%,0.4)] hover:shadow-[0_10px_40px_-10px_hsl(45,85%,55%,0.5)] hover:from-[hsl(48,90%,58%)] hover:to-[hsl(45,85%,52%)] hover:scale-[1.02] active:scale-[0.98]",
-        goldOutline: "border-2 border-[hsl(45,85%,55%)] text-white hover:bg-[hsl(45,85%,55%)] hover:text-white font-semibold",
-        premium: "bg-card border border-border text-foreground hover:border-[hsl(45,85%,55%)] hover:text-[hsl(45,85%,55%)] font-medium",
-        whatsapp: "bg-[#25D366] text-[hsl(30,10%,4%)] font-semibold hover:bg-[#20BD5A] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
+        // Premium variants - Using design system tokens
+        gold: "bg-gradient-to-r from-gold to-gold-dark text-primary-foreground font-semibold shadow-gold hover:shadow-elegant hover:from-gold-light hover:to-gold hover:scale-[1.02] active:scale-[0.98]",
+        goldOutline: "border-2 border-gold text-foreground hover:bg-gold hover:text-primary-foreground font-semibold",
+        premium: "bg-card border border-border text-foreground hover:border-gold hover:text-gold font-medium",
+        whatsapp: "bg-whatsapp text-primary-foreground font-semibold hover:bg-whatsapp-hover shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
       },
       size: {
         default: "h-10 px-4 py-2",
