@@ -174,7 +174,7 @@ const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
     mode: 'onBlur',
   });
 
-  const whatsappNumber = '213XXXXXXXXX'; // Replace with actual number
+  const whatsappNumber = '213795443714';
 
   const getWhatsAppUrl = (data: FormData) => {
     const selectedWilaya = wilayas.find(w => w.code === data.wilaya);

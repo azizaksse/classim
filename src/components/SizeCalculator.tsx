@@ -119,7 +119,7 @@ const SizeCalculator = () => {
     setResult({ size, fit, confidence });
   };
 
-  const whatsappNumber = '213XXXXXXXXX'; // Replace with actual number
+  const whatsappNumber = '213795443714';
   const getWhatsAppUrl = () => {
     if (!result) return '';
     

@@ -6,7 +6,7 @@ import logo from '@/assets/logo.jpg';
 const Hero = () => {
   const { t, language } = useLanguage();
 
-  const whatsappNumber = '213XXXXXXXXX'; // Replace with actual number
+  const whatsappNumber = '213795443714';
   const whatsappMessage = encodeURIComponent(t('whatsapp.greeting'));
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 

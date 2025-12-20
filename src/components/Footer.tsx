@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MessageCircle, Instagram, Phone } from 'lucide-react';
+import { MessageCircle, Instagram, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
   const { t, language } = useLanguage();
 
-  const whatsappNumber = '213XXXXXXXXX';
+  const whatsappNumber = '213795443714';
+  const email = 'ganiislam452@gmail.com';
 
   return (
     <footer className="bg-card border-t border-border">
@@ -65,7 +66,16 @@ const Footer = () => {
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  +213 XX XX XX XX
+                  +213 795 44 37 14
+                </a>
+              </li>
+              <li>
+                <a 
+                  href={`mailto:${email}`}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                  {email}
                 </a>
               </li>
               <li>

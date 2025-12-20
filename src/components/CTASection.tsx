@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 const CTASection = () => {
   const { t, language } = useLanguage();
 
-  const whatsappNumber = '213XXXXXXXXX';
+  const whatsappNumber = '213795443714';
   const whatsappMessage = encodeURIComponent(t('whatsapp.greeting'));
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 

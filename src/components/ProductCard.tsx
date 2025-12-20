@@ -17,7 +17,7 @@ interface ProductCardProps {
 const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }: ProductCardProps) => {
   const { language, t } = useLanguage();
 
-  const whatsappNumber = '213XXXXXXXXX';
+  const whatsappNumber = '213795443714';
   const productName = language === 'ar' ? nameAr : nameFr;
   const message = language === 'ar'
     ? `السلام عليكم، أريد الاستفسار عن: ${productName}`
