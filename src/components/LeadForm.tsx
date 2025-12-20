@@ -23,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { MessageCircle, User, MapPin, Phone, Building, Home } from 'lucide-react';
+import { MessageCircle, User, MapPin, Phone, Building, Home, Tag } from 'lucide-react';
 
 interface LeadFormProps {
   productName: string;
@@ -113,6 +113,9 @@ const getValidationMessages = (language: 'ar' | 'fr') => ({
   deliveryPlace: {
     required: language === 'ar' ? 'مكان التوصيل مطلوب' : 'Le lieu de livraison est requis',
   },
+  orderType: {
+    required: language === 'ar' ? 'نوع الطلب مطلوب' : 'Le type de commande est requis',
+  },
 });
 
 // Create schema based on language
@@ -143,6 +146,10 @@ const createFormSchema = (language: 'ar' | 'fr') => {
       .enum(['home', 'desktop'], {
         required_error: messages.deliveryPlace.required,
       }),
+    orderType: z
+      .enum(['rent', 'sale'], {
+        required_error: messages.orderType.required,
+      }),
   });
 };
 
@@ -162,6 +169,7 @@ const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
       wilaya: '',
       city: '',
       deliveryPlace: 'home',
+      orderType: 'rent',
     },
     mode: 'onBlur',
   });
@@ -178,10 +186,15 @@ const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
       ? (data.deliveryPlace === 'home' ? 'المنزل' : 'المكتب')
       : (data.deliveryPlace === 'home' ? 'Domicile' : 'Bureau');
 
+    const orderTypeText = language === 'ar'
+      ? (data.orderType === 'rent' ? 'كراء' : 'شراء')
+      : (data.orderType === 'rent' ? 'Location' : 'Achat');
+
     const message = language === 'ar'
       ? `السلام عليكم، أريد حجز:
 📦 المنتج: ${productName}
 📏 المقاس: ${selectedSize || 'غير محدد'}
+🏷️ نوع الطلب: ${orderTypeText}
 
 👤 الاسم: ${data.name}
 📱 الهاتف: ${data.phone}
@@ -193,6 +206,7 @@ const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
       : `Bonjour, je souhaite réserver:
 📦 Produit: ${productName}
 📏 Taille: ${selectedSize || 'Non spécifiée'}
+🏷️ Type de commande: ${orderTypeText}
 
 👤 Nom: ${data.name}
 📱 Téléphone: ${data.phone}
@@ -372,7 +386,41 @@ Merci`;
             )}
           />
 
-          {/* Submit Button */}
+          {/* Order Type (Rent/Sale) */}
+          <FormField
+            control={form.control}
+            name="orderType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2 text-foreground">
+                  <Tag className="w-4 h-4 text-primary" />
+                  {language === 'ar' ? 'نوع الطلب' : 'Type de commande'}
+                </FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="flex gap-4"
+                  >
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <RadioGroupItem value="rent" id="rent" className="border-primary text-primary" />
+                      <Label htmlFor="rent" className="cursor-pointer text-foreground">
+                        {language === 'ar' ? 'كراء' : 'Location'}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <RadioGroupItem value="sale" id="sale" className="border-primary text-primary" />
+                      <Label htmlFor="sale" className="cursor-pointer text-foreground">
+                        {language === 'ar' ? 'شراء' : 'Achat'}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage className="text-destructive text-sm" />
+              </FormItem>
+            )}
+          />
+
           <Button
             type="submit"
             variant="whatsapp"
