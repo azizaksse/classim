@@ -45,7 +45,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Categories
     'category.costumes': 'كوستيم',
-    'category.show': 'شو',
+    'category.shoes': 'أحذية',
     'category.tshirts': 'تيشيرت',
     'category.accessories': 'إكسسوارات',
     
@@ -108,7 +108,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Categories
     'category.costumes': 'Costumes',
-    'category.show': 'Show',
+    'category.shoes': 'Chaussures',
     'category.tshirts': 'T-shirts',
     'category.accessories': 'Accessoires',
     

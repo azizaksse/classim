@@ -44,7 +44,7 @@ export const products = [
     rentPrice: 15000,
     salePrice: 75000,
     sizes: ['M', 'L', 'XL'],
-    category: 'show',
+    category: 'shoes',
   },
   {
     id: '4',
@@ -104,7 +104,7 @@ export const products = [
     rentPrice: 14000,
     salePrice: 68000,
     sizes: ['M', 'L', 'XL'],
-    category: 'show',
+    category: 'shoes',
   },
 ];
 
@@ -117,9 +117,9 @@ export const categories = [
     count: 6,
   },
   {
-    id: 'show',
-    nameAr: 'شو',
-    nameFr: 'Show',
+    id: 'shoes',
+    nameAr: 'أحذية',
+    nameFr: 'Chaussures',
     image: noirEtoile,
     count: 2,
   },
