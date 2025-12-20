@@ -5,8 +5,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SizeCalculator from '@/components/SizeCalculator';
+import LeadForm from '@/components/LeadForm';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Truck, CreditCard, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Truck, CreditCard, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const allProducts = [
   {
@@ -72,20 +73,6 @@ const ProductDetail = () => {
 
   const productName = language === 'ar' ? product.nameAr : product.nameFr;
   const productDescription = language === 'ar' ? product.descriptionAr : product.descriptionFr;
-
-  const whatsappNumber = '213XXXXXXXXX';
-  const getWhatsAppUrl = () => {
-    const message = language === 'ar'
-      ? `السلام عليكم، أريد حجز: ${productName}
-المقاس: ${selectedSize || '___'}
-كراء / بيع
-الولاية: ___`
-      : `Bonjour, je voudrais réserver: ${productName}
-Taille: ${selectedSize || '___'}
-Location / Vente
-Wilaya: ___`;
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-  };
 
   return (
     <>
@@ -207,18 +194,11 @@ Wilaya: ___`;
                   </div>
                 </div>
 
-                {/* CTA */}
-                <Button
-                  variant="whatsapp"
-                  size="xl"
-                  className="w-full"
-                  asChild
-                >
-                  <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="w-5 h-5" />
-                    {t('product.cta')}
-                  </a>
-                </Button>
+                {/* Lead Form */}
+                <LeadForm 
+                  productName={productName} 
+                  selectedSize={selectedSize} 
+                />
               </div>
             </div>
 
