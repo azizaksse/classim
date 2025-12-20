@@ -37,22 +37,28 @@
 
     --radius: 0.5rem;
 
-    /* Custom Premium Colors */
-    --gold: 40 45% 65%;
-    --gold-light: 40 50% 75%;
-    --gold-dark: 40 40% 50%;
+    /* Custom Premium Colors - Modern Dark Gold */
+    --gold: 38 50% 45%;
+    --gold-light: 40 45% 55%;
+    --gold-dark: 35 55% 35%;
+    --gold-muted: 38 40% 40%;
     --champagne: 38 35% 80%;
     --ivory: 40 30% 96%;
     --obsidian: 30 10% 4%;
     --charcoal: 30 8% 12%;
 
+    /* CTA Gradient - Modern Dark Gold */
+    --cta-gold-from: 38 50% 42%;
+    --cta-gold-to: 35 55% 35%;
+
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(40 45% 65%), hsl(40 50% 75%));
+    --gradient-gold: linear-gradient(135deg, hsl(38 50% 45%), hsl(40 45% 55%));
+    --gradient-cta: linear-gradient(135deg, hsl(38 50% 42%), hsl(35 55% 35%));
     --gradient-dark: linear-gradient(180deg, hsl(30 10% 4%), hsl(30 8% 8%));
     --gradient-card: linear-gradient(145deg, hsl(30 8% 10%), hsl(30 8% 6%));
 
     /* Shadows */
-    --shadow-gold: 0 4px 20px -4px hsl(40 45% 65% / 0.3);
+    --shadow-gold: 0 4px 20px -4px hsl(38 50% 45% / 0.4);
     --shadow-elegant: 0 10px 40px -10px hsl(0 0% 0% / 0.5);
     --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.4);
 
@@ -99,11 +105,11 @@
 @layer components {
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-gold);
+    background-image: linear-gradient(135deg, hsl(38 50% 50%), hsl(40 45% 60%));
   }
 
   .bg-gradient-gold {
-    background-image: var(--gradient-gold);
+    background-image: var(--gradient-cta);
   }
 
   .border-gold {
@@ -180,7 +186,7 @@
   }
 
   .gold-glow {
-    box-shadow: 0 0 30px hsl(40 45% 65% / 0.2);
+    box-shadow: 0 0 30px hsl(38 50% 45% / 0.25);
   }
 }
 

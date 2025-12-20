@@ -15,10 +15,10 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // Premium variants
-        gold: "bg-gradient-to-r from-[hsl(40,45%,65%)] to-[hsl(40,50%,75%)] text-[hsl(30,10%,4%)] font-semibold shadow-[0_4px_20px_-4px_hsl(40,45%,65%,0.3)] hover:shadow-[0_10px_40px_-10px_hsl(0,0%,0%,0.5)] hover:scale-[1.02] active:scale-[0.98]",
-        goldOutline: "border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold",
-        premium: "bg-card border border-border text-foreground hover:border-primary hover:text-primary font-medium",
+        // Premium variants - Modern Dark Gold
+        gold: "bg-gradient-to-r from-[hsl(38,50%,42%)] to-[hsl(35,55%,35%)] text-[hsl(40,30%,96%)] font-semibold shadow-[0_4px_20px_-4px_hsl(38,50%,45%,0.4)] hover:shadow-[0_10px_40px_-10px_hsl(38,50%,45%,0.5)] hover:from-[hsl(38,50%,45%)] hover:to-[hsl(35,55%,38%)] hover:scale-[1.02] active:scale-[0.98]",
+        goldOutline: "border-2 border-[hsl(38,50%,42%)] text-[hsl(38,50%,45%)] hover:bg-[hsl(38,50%,42%)] hover:text-[hsl(40,30%,96%)] font-semibold",
+        premium: "bg-card border border-border text-foreground hover:border-[hsl(38,50%,42%)] hover:text-[hsl(38,50%,45%)] font-medium",
         whatsapp: "bg-[#25D366] text-[hsl(30,10%,4%)] font-semibold hover:bg-[#20BD5A] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
       },
       size: {
