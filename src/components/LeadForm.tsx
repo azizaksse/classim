@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +14,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { MessageCircle, User, MapPin, Phone, Building, Home } from 'lucide-react';
 
 interface LeadFormProps {
@@ -79,37 +90,102 @@ const wilayas = [
   { code: '58', nameAr: 'المنيعة', nameFr: 'El Meniaa' },
 ];
 
+// Validation messages
+const getValidationMessages = (language: 'ar' | 'fr') => ({
+  name: {
+    required: language === 'ar' ? 'الاسم مطلوب' : 'Le nom est requis',
+    min: language === 'ar' ? 'الاسم يجب أن يكون 3 أحرف على الأقل' : 'Le nom doit contenir au moins 3 caractères',
+    max: language === 'ar' ? 'الاسم يجب أن لا يتجاوز 50 حرف' : 'Le nom ne doit pas dépasser 50 caractères',
+  },
+  phone: {
+    required: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Le numéro de téléphone est requis',
+    invalid: language === 'ar' ? 'رقم الهاتف غير صحيح (مثال: 0551234567)' : 'Numéro de téléphone invalide (ex: 0551234567)',
+  },
+  wilaya: {
+    required: language === 'ar' ? 'الولاية مطلوبة' : 'La wilaya est requise',
+  },
+  city: {
+    required: language === 'ar' ? 'المدينة مطلوبة' : 'La ville est requise',
+    min: language === 'ar' ? 'المدينة يجب أن تكون حرفين على الأقل' : 'La ville doit contenir au moins 2 caractères',
+    max: language === 'ar' ? 'المدينة يجب أن لا تتجاوز 50 حرف' : 'La ville ne doit pas dépasser 50 caractères',
+  },
+  deliveryPlace: {
+    required: language === 'ar' ? 'مكان التوصيل مطلوب' : 'Le lieu de livraison est requis',
+  },
+});
+
+// Create schema based on language
+const createFormSchema = (language: 'ar' | 'fr') => {
+  const messages = getValidationMessages(language);
+  
+  return z.object({
+    name: z
+      .string()
+      .min(1, messages.name.required)
+      .min(3, messages.name.min)
+      .max(50, messages.name.max)
+      .trim(),
+    phone: z
+      .string()
+      .min(1, messages.phone.required)
+      .regex(/^(0)(5|6|7)[0-9]{8}$/, messages.phone.invalid),
+    wilaya: z
+      .string()
+      .min(1, messages.wilaya.required),
+    city: z
+      .string()
+      .min(1, messages.city.required)
+      .min(2, messages.city.min)
+      .max(50, messages.city.max)
+      .trim(),
+    deliveryPlace: z
+      .enum(['home', 'desktop'], {
+        required_error: messages.deliveryPlace.required,
+      }),
+  });
+};
+
+type FormData = z.infer<ReturnType<typeof createFormSchema>>;
+
 const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
   const { language } = useLanguage();
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [wilaya, setWilaya] = useState('');
-  const [city, setCity] = useState('');
-  const [deliveryPlace, setDeliveryPlace] = useState<'home' | 'desktop'>('home');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formSchema = createFormSchema(language);
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      phone: '',
+      wilaya: '',
+      city: '',
+      deliveryPlace: 'home',
+    },
+    mode: 'onBlur',
+  });
 
   const whatsappNumber = '213XXXXXXXXX'; // Replace with actual number
 
-  const isFormValid = name.trim() && phone.trim() && wilaya && city.trim();
-
-  const getWhatsAppUrl = () => {
-    const selectedWilaya = wilayas.find(w => w.code === wilaya);
+  const getWhatsAppUrl = (data: FormData) => {
+    const selectedWilaya = wilayas.find(w => w.code === data.wilaya);
     const wilayaName = selectedWilaya 
       ? (language === 'ar' ? selectedWilaya.nameAr : selectedWilaya.nameFr)
       : '';
     
     const deliveryPlaceText = language === 'ar'
-      ? (deliveryPlace === 'home' ? 'المنزل' : 'المكتب')
-      : (deliveryPlace === 'home' ? 'Domicile' : 'Bureau');
+      ? (data.deliveryPlace === 'home' ? 'المنزل' : 'المكتب')
+      : (data.deliveryPlace === 'home' ? 'Domicile' : 'Bureau');
 
     const message = language === 'ar'
       ? `السلام عليكم، أريد حجز:
 📦 المنتج: ${productName}
 📏 المقاس: ${selectedSize || 'غير محدد'}
 
-👤 الاسم: ${name}
-📱 الهاتف: ${phone}
+👤 الاسم: ${data.name}
+📱 الهاتف: ${data.phone}
 🏙️ الولاية: ${wilayaName}
-🏘️ المدينة: ${city}
+🏘️ المدينة: ${data.city}
 📍 مكان التوصيل: ${deliveryPlaceText}
 
 شكراً لكم`
@@ -117,10 +193,10 @@ const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
 📦 Produit: ${productName}
 📏 Taille: ${selectedSize || 'Non spécifiée'}
 
-👤 Nom: ${name}
-📱 Téléphone: ${phone}
+👤 Nom: ${data.name}
+📱 Téléphone: ${data.phone}
 🏙️ Wilaya: ${wilayaName}
-🏘️ Ville: ${city}
+🏘️ Ville: ${data.city}
 📍 Lieu de livraison: ${deliveryPlaceText}
 
 Merci`;
@@ -128,144 +204,179 @@ Merci`;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
   };
 
+  const onSubmit = (data: FormData) => {
+    setIsSubmitting(true);
+    const url = getWhatsAppUrl(data);
+    window.open(url, '_blank');
+    setIsSubmitting(false);
+  };
+
   return (
-    <div className="glass-card rounded-2xl p-6 space-y-5">
-      <h3 className={`text-xl font-bold text-foreground ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
+    <div className="glass-card rounded-2xl p-6">
+      <h3 className={`text-xl font-bold text-foreground mb-5 ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
         {language === 'ar' ? 'معلومات الطلب' : 'Informations de commande'}
       </h3>
 
-      {/* Name */}
-      <div className="space-y-2">
-        <Label htmlFor="name" className="flex items-center gap-2 text-foreground">
-          <User className="w-4 h-4 text-primary" />
-          {language === 'ar' ? 'الاسم الكامل' : 'Nom complet'}
-        </Label>
-        <Input
-          id="name"
-          type="text"
-          placeholder={language === 'ar' ? 'محمد أحمد' : 'Mohamed Ahmed'}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
-        />
-      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          {/* Name */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2 text-foreground">
+                  <User className="w-4 h-4 text-primary" />
+                  {language === 'ar' ? 'الاسم الكامل' : 'Nom complet'}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={language === 'ar' ? 'محمد أحمد' : 'Mohamed Ahmed'}
+                    className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-destructive text-sm" />
+              </FormItem>
+            )}
+          />
 
-      {/* Phone */}
-      <div className="space-y-2">
-        <Label htmlFor="phone" className="flex items-center gap-2 text-foreground">
-          <Phone className="w-4 h-4 text-primary" />
-          {language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}
-        </Label>
-        <Input
-          id="phone"
-          type="tel"
-          placeholder="0X XX XX XX XX"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
-          dir="ltr"
-        />
-      </div>
+          {/* Phone */}
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2 text-foreground">
+                  <Phone className="w-4 h-4 text-primary" />
+                  {language === 'ar' ? 'رقم الهاتف' : 'Numéro de téléphone'}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    placeholder="0551234567"
+                    className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                    dir="ltr"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-destructive text-sm" />
+              </FormItem>
+            )}
+          />
 
-      {/* Wilaya */}
-      <div className="space-y-2">
-        <Label htmlFor="wilaya" className="flex items-center gap-2 text-foreground">
-          <MapPin className="w-4 h-4 text-primary" />
-          {language === 'ar' ? 'الولاية' : 'Wilaya'}
-        </Label>
-        <Select value={wilaya} onValueChange={setWilaya}>
-          <SelectTrigger className="w-full bg-secondary border-border text-foreground">
-            <SelectValue placeholder={language === 'ar' ? 'اختر ولايتك' : 'Sélectionnez votre wilaya'} />
-          </SelectTrigger>
-          <SelectContent className="bg-card border-border max-h-[300px] z-50">
-            {wilayas.map((w) => (
-              <SelectItem 
-                key={w.code} 
-                value={w.code}
-                className="text-foreground hover:bg-secondary focus:bg-secondary"
-              >
-                {w.code} - {language === 'ar' ? w.nameAr : w.nameFr}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          {/* Wilaya */}
+          <FormField
+            control={form.control}
+            name="wilaya"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2 text-foreground">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  {language === 'ar' ? 'الولاية' : 'Wilaya'}
+                </FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="w-full bg-secondary border-border text-foreground">
+                      <SelectValue placeholder={language === 'ar' ? 'اختر ولايتك' : 'Sélectionnez votre wilaya'} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-card border-border max-h-[300px] z-50">
+                    {wilayas.map((w) => (
+                      <SelectItem 
+                        key={w.code} 
+                        value={w.code}
+                        className="text-foreground hover:bg-secondary focus:bg-secondary"
+                      >
+                        {w.code} - {language === 'ar' ? w.nameAr : w.nameFr}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage className="text-destructive text-sm" />
+              </FormItem>
+            )}
+          />
 
-      {/* City */}
-      <div className="space-y-2">
-        <Label htmlFor="city" className="flex items-center gap-2 text-foreground">
-          <Building className="w-4 h-4 text-primary" />
-          {language === 'ar' ? 'المدينة / البلدية' : 'Ville / Commune'}
-        </Label>
-        <Input
-          id="city"
-          type="text"
-          placeholder={language === 'ar' ? 'اسم المدينة' : 'Nom de la ville'}
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
-        />
-      </div>
+          {/* City */}
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2 text-foreground">
+                  <Building className="w-4 h-4 text-primary" />
+                  {language === 'ar' ? 'المدينة / البلدية' : 'Ville / Commune'}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={language === 'ar' ? 'اسم المدينة' : 'Nom de la ville'}
+                    className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-destructive text-sm" />
+              </FormItem>
+            )}
+          />
 
-      {/* Delivery Place */}
-      <div className="space-y-3">
-        <Label className="flex items-center gap-2 text-foreground">
-          <Home className="w-4 h-4 text-primary" />
-          {language === 'ar' ? 'مكان التوصيل' : 'Lieu de livraison'}
-        </Label>
-        <RadioGroup
-          value={deliveryPlace}
-          onValueChange={(value) => setDeliveryPlace(value as 'home' | 'desktop')}
-          className="flex gap-4"
-        >
-          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-            <RadioGroupItem value="home" id="home" className="border-primary text-primary" />
-            <Label htmlFor="home" className="cursor-pointer text-foreground flex items-center gap-2">
-              <Home className="w-4 h-4" />
-              {language === 'ar' ? 'المنزل' : 'Domicile'}
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-            <RadioGroupItem value="desktop" id="desktop" className="border-primary text-primary" />
-            <Label htmlFor="desktop" className="cursor-pointer text-foreground flex items-center gap-2">
-              <Building className="w-4 h-4" />
-              {language === 'ar' ? 'المكتب' : 'Bureau'}
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
+          {/* Delivery Place */}
+          <FormField
+            control={form.control}
+            name="deliveryPlace"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2 text-foreground">
+                  <Home className="w-4 h-4 text-primary" />
+                  {language === 'ar' ? 'مكان التوصيل' : 'Lieu de livraison'}
+                </FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="flex gap-4"
+                  >
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <RadioGroupItem value="home" id="home" className="border-primary text-primary" />
+                      <Label htmlFor="home" className="cursor-pointer text-foreground flex items-center gap-2">
+                        <Home className="w-4 h-4" />
+                        {language === 'ar' ? 'المنزل' : 'Domicile'}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <RadioGroupItem value="desktop" id="desktop" className="border-primary text-primary" />
+                      <Label htmlFor="desktop" className="cursor-pointer text-foreground flex items-center gap-2">
+                        <Building className="w-4 h-4" />
+                        {language === 'ar' ? 'المكتب' : 'Bureau'}
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage className="text-destructive text-sm" />
+              </FormItem>
+            )}
+          />
 
-      {/* Submit Button */}
-      {isFormValid ? (
-        <Button
-          variant="whatsapp"
-          size="lg"
-          className="w-full mt-4"
-          asChild
-        >
-          <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer">
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="whatsapp"
+            size="lg"
+            className="w-full mt-4"
+            disabled={isSubmitting}
+          >
             <MessageCircle className="w-5 h-5" />
             {language === 'ar' ? 'أرسل الطلب عبر واتساب' : 'Envoyer via WhatsApp'}
-          </a>
-        </Button>
-      ) : (
-        <Button
-          variant="whatsapp"
-          size="lg"
-          className="w-full mt-4"
-          disabled
-        >
-          <MessageCircle className="w-5 h-5" />
-          {language === 'ar' ? 'أكمل البيانات للطلب' : 'Complétez le formulaire'}
-        </Button>
-      )}
+          </Button>
 
-      {/* Trust note */}
-      <p className="text-xs text-muted-foreground text-center">
-        {language === 'ar' 
-          ? '✓ دفع عند الاستلام • ✓ توصيل لكل الولايات'
-          : '✓ Paiement à la livraison • ✓ Livraison nationale'}
-      </p>
+          {/* Trust note */}
+          <p className="text-xs text-muted-foreground text-center">
+            {language === 'ar' 
+              ? '✓ دفع عند الاستلام • ✓ توصيل لكل الولايات'
+              : '✓ Paiement à la livraison • ✓ Livraison nationale'}
+          </p>
+        </form>
+      </Form>
     </div>
   );
 };
