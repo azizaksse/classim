@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ProductCard from './ProductCard';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import AnimatedSection from '@/components/AnimatedSection';
 import { products } from '@/data/products';
 
 const FeaturedProducts = () => {
@@ -15,30 +17,34 @@ const FeaturedProducts = () => {
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-12">
+        <AnimatedSection className="flex items-center justify-between mb-12">
           <h2 className={`text-3xl md:text-4xl font-bold ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
             <span className="text-gradient-gold">
               {language === 'ar' ? 'الأكثر طلباً' : 'Les plus demandés'}
             </span>
           </h2>
-          <Button variant="goldOutline" asChild>
-            <Link to="/catalogue" className="flex items-center gap-2">
-              {t('hero.cta.secondary')}
-              {dir === 'rtl' ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-            </Link>
-          </Button>
-        </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button variant="goldOutline" asChild>
+              <Link to="/catalogue" className="flex items-center gap-2">
+                {t('hero.cta.secondary')}
+                {dir === 'rtl' ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+              </Link>
+            </Button>
+          </motion.div>
+        </AnimatedSection>
 
         {/* Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {featuredProducts.map((product, index) => (
-            <div
+            <motion.div
               key={product.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
             >
               <ProductCard {...product} />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

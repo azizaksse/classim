@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
@@ -25,13 +26,18 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return (
-    <div className="group glass-card rounded-xl overflow-hidden hover-lift">
+    <motion.div 
+      className="group glass-card rounded-xl overflow-hidden"
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+    >
       {/* Image */}
       <Link to={`/product/${id}`} className="block relative aspect-[3/4] overflow-hidden">
-        <img
+        <motion.img
           src={images[0]}
           alt={productName}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover"
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.5 }}
         />
         {/* Second image on hover */}
         {images[1] && (
@@ -78,12 +84,14 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
         {/* Sizes */}
         <div className="flex flex-wrap gap-1 mb-4">
           {sizes.slice(0, 4).map((size) => (
-            <span
+            <motion.span
               key={size}
               className="px-2 py-0.5 text-xs rounded bg-secondary text-secondary-foreground"
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
             >
               {size}
-            </span>
+            </motion.span>
           ))}
           {sizes.length > 4 && (
             <span className="px-2 py-0.5 text-xs rounded bg-secondary text-secondary-foreground">
@@ -93,19 +101,21 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
         </div>
 
         {/* CTA */}
-        <Button
-          variant="whatsapp"
-          size="sm"
-          className="w-full"
-          asChild
-        >
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="w-4 h-4" />
-            {t('product.cta')}
-          </a>
-        </Button>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            variant="whatsapp"
+            size="sm"
+            className="w-full"
+            asChild
+          >
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="w-4 h-4" />
+              {t('product.cta')}
+            </a>
+          </Button>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

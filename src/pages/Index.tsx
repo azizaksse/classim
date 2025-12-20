@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useLanguage } from '@/contexts/LanguageContext';
+import PageTransition from '@/components/PageTransition';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import TrustBadges from '@/components/TrustBadges';
@@ -23,7 +24,7 @@ const Index = () => {
     : 'Modèles premium de costumes de mariage en location et vente. Livraison nationale en Algérie. Paiement à la livraison.';
 
   return (
-    <>
+    <PageTransition>
       <Helmet>
         <html lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'} />
         <title>{title}</title>
@@ -48,7 +49,7 @@ const Index = () => {
         <CTASection />
         <Footer />
       </main>
-    </>
+    </PageTransition>
   );
 };
 

@@ -1,6 +1,8 @@
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Star, Quote } from 'lucide-react';
 import { useState } from 'react';
+import AnimatedSection from '@/components/AnimatedSection';
 
 const testimonials = [
   {
@@ -161,7 +163,10 @@ interface TestimonialCardProps {
 
 const TestimonialCard = ({ testimonial, language }: TestimonialCardProps) => {
   return (
-    <div className="glass-card rounded-2xl p-6 w-[300px] md:w-[350px] relative flex-shrink-0">
+    <motion.div 
+      className="glass-card rounded-2xl p-6 w-[300px] md:w-[350px] relative flex-shrink-0"
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    >
       {/* Quote Icon */}
       <div className="absolute top-4 end-4 opacity-10">
         <Quote className="w-10 h-10 text-primary" />
@@ -195,7 +200,7 @@ const TestimonialCard = ({ testimonial, language }: TestimonialCardProps) => {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -203,11 +208,26 @@ const Testimonials = () => {
   const { language } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
     <section className="py-20 bg-background overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
+        <AnimatedSection className="text-center mb-12">
           <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
             <span className="text-gradient-gold">
               {language === 'ar' ? 'آراء زبائننا' : 'Avis de nos clients'}
@@ -218,7 +238,7 @@ const Testimonials = () => {
               ? 'اكتشف تجارب زبائننا الراضين'
               : 'Découvrez les expériences de nos clients satisfaits'}
           </p>
-        </div>
+        </AnimatedSection>
       </div>
 
       {/* Scrolling Testimonials */}
@@ -262,32 +282,38 @@ const Testimonials = () => {
 
       <div className="container mx-auto px-4">
         {/* Stats */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <motion.div 
+          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <motion.div variants={itemVariants}>
             <p className="text-4xl font-bold text-gradient-gold mb-1">500+</p>
             <p className="text-sm text-muted-foreground">
               {language === 'ar' ? 'زبون راضي' : 'Clients satisfaits'}
             </p>
-          </div>
-          <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          </motion.div>
+          <motion.div variants={itemVariants}>
             <p className="text-4xl font-bold text-gradient-gold mb-1">4.9</p>
             <p className="text-sm text-muted-foreground">
               {language === 'ar' ? 'تقييم متوسط' : 'Note moyenne'}
             </p>
-          </div>
-          <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          </motion.div>
+          <motion.div variants={itemVariants}>
             <p className="text-4xl font-bold text-gradient-gold mb-1">58</p>
             <p className="text-sm text-muted-foreground">
               {language === 'ar' ? 'ولاية مغطاة' : 'Wilayas couvertes'}
             </p>
-          </div>
-          <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          </motion.div>
+          <motion.div variants={itemVariants}>
             <p className="text-4xl font-bold text-gradient-gold mb-1">24h</p>
             <p className="text-sm text-muted-foreground">
               {language === 'ar' ? 'توصيل سريع' : 'Livraison rapide'}
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

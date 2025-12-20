@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Truck, CreditCard, Ruler } from 'lucide-react';
 
@@ -24,18 +25,26 @@ const TrustBadges = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
           {badges.map((badge, index) => (
-            <div
+            <motion.div
               key={index}
-              className="flex items-center gap-3 px-4 py-2 animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="flex items-center gap-3 px-4 py-2"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              whileHover={{ scale: 1.05 }}
             >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <motion.div 
+                className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.5 }}
+              >
                 <badge.icon className="w-5 h-5 text-primary" />
-              </div>
+              </motion.div>
               <span className="text-sm md:text-base font-medium text-foreground">
                 {badge.text}
               </span>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
