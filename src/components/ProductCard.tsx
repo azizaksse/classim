@@ -77,7 +77,7 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
 
         {/* Sizes */}
         <div className="flex flex-wrap gap-1 mb-4">
-          {sizes.map((size) => (
+          {sizes.slice(0, 4).map((size) => (
             <span
               key={size}
               className="px-2 py-0.5 text-xs rounded bg-secondary text-secondary-foreground"
@@ -85,6 +85,11 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
               {size}
             </span>
           ))}
+          {sizes.length > 4 && (
+            <span className="px-2 py-0.5 text-xs rounded bg-secondary text-secondary-foreground">
+              +{sizes.length - 4}
+            </span>
+          )}
         </div>
 
         {/* CTA */}
