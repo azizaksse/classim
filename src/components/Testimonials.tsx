@@ -265,22 +265,13 @@ const Testimonials = () => {
                 </p>
 
                 {/* Customer Info */}
-                <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20">
-                    <img
-                      src={testimonial.image}
-                      alt={language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h4 className={`font-semibold text-foreground text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
-                      {language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      {language === 'ar' ? testimonial.locationAr : testimonial.locationFr}
-                    </p>
-                  </div>
+                <div className="pt-4 border-t border-border/50">
+                  <h4 className={`font-semibold text-foreground text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
+                    {language === 'ar' ? testimonial.nameAr : testimonial.nameFr}
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    {language === 'ar' ? testimonial.locationAr : testimonial.locationFr}
+                  </p>
                 </div>
               </div>
             </motion.div>
