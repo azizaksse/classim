@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Globe } from 'lucide-react';
+import logo from '@/assets/logo.jpg';
 
 const Navbar = () => {
   const { language, setLanguage, t, dir } = useLanguage();
@@ -25,8 +26,11 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className={`text-2xl md:text-3xl font-bold text-gradient-gold ${dir === 'rtl' ? 'font-arabic' : 'font-display'}`}>
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-primary/50">
+              <img src={logo} alt="Classimo Logo" className="w-full h-full object-cover" />
+            </div>
+            <span className={`text-xl md:text-2xl font-bold text-gradient-gold ${dir === 'rtl' ? 'font-arabic' : 'font-display'}`}>
               {language === 'ar' ? 'كلاسيمو' : 'Classimo'}
             </span>
           </Link>
