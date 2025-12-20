@@ -37,28 +37,28 @@
 
     --radius: 0.5rem;
 
-    /* Custom Premium Colors - Modern Dark Gold */
-    --gold: 38 50% 45%;
-    --gold-light: 40 45% 55%;
-    --gold-dark: 35 55% 35%;
-    --gold-muted: 38 40% 40%;
+    /* Custom Premium Colors - Modern Yellow Gold */
+    --gold: 45 85% 55%;
+    --gold-light: 48 90% 60%;
+    --gold-dark: 42 80% 48%;
+    --gold-muted: 45 70% 50%;
     --champagne: 38 35% 80%;
     --ivory: 40 30% 96%;
     --obsidian: 30 10% 4%;
     --charcoal: 30 8% 12%;
 
-    /* CTA Gradient - Modern Dark Gold */
-    --cta-gold-from: 38 50% 42%;
-    --cta-gold-to: 35 55% 35%;
+    /* CTA Gradient - Vibrant Yellow Gold */
+    --cta-gold-from: 45 85% 55%;
+    --cta-gold-to: 42 80% 48%;
 
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(38 50% 45%), hsl(40 45% 55%));
-    --gradient-cta: linear-gradient(135deg, hsl(38 50% 42%), hsl(35 55% 35%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 85% 55%), hsl(48 90% 60%));
+    --gradient-cta: linear-gradient(135deg, hsl(45 85% 55%), hsl(42 80% 48%));
     --gradient-dark: linear-gradient(180deg, hsl(30 10% 4%), hsl(30 8% 8%));
     --gradient-card: linear-gradient(145deg, hsl(30 8% 10%), hsl(30 8% 6%));
 
     /* Shadows */
-    --shadow-gold: 0 4px 20px -4px hsl(38 50% 45% / 0.4);
+    --shadow-gold: 0 4px 20px -4px hsl(45 85% 55% / 0.4);
     --shadow-elegant: 0 10px 40px -10px hsl(0 0% 0% / 0.5);
     --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.4);
 
@@ -105,7 +105,7 @@
 @layer components {
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(38 50% 50%), hsl(40 45% 60%));
+    background-image: linear-gradient(135deg, hsl(45 85% 55%), hsl(48 90% 65%));
   }
 
   .bg-gradient-gold {
