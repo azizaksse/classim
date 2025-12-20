@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import ImageUpload from '@/components/ImageUpload';
 
 interface Category {
   id: string;
@@ -26,7 +27,7 @@ const AdminCategories = () => {
   const [formData, setFormData] = useState({
     name_ar: '',
     name_fr: '',
-    image_url: '',
+    image_url: [] as string[],
   });
 
   const queryClient = useQueryClient();
@@ -49,7 +50,7 @@ const AdminCategories = () => {
       const { error } = await supabase.from('categories').insert({
         name_ar: data.name_ar,
         name_fr: data.name_fr,
-        image_url: data.image_url || null,
+        image_url: data.image_url[0] || null,
       });
       if (error) throw error;
     },
@@ -68,7 +69,7 @@ const AdminCategories = () => {
       const { error } = await supabase.from('categories').update({
         name_ar: data.name_ar,
         name_fr: data.name_fr,
-        image_url: data.image_url || null,
+        image_url: data.image_url[0] || null,
       }).eq('id', id);
       if (error) throw error;
     },
@@ -97,7 +98,7 @@ const AdminCategories = () => {
   });
 
   const resetForm = () => {
-    setFormData({ name_ar: '', name_fr: '', image_url: '' });
+    setFormData({ name_ar: '', name_fr: '', image_url: [] });
     setEditingCategory(null);
     setIsDialogOpen(false);
   };
@@ -107,7 +108,7 @@ const AdminCategories = () => {
     setFormData({
       name_ar: category.name_ar,
       name_fr: category.name_fr,
-      image_url: category.image_url || '',
+      image_url: category.image_url ? [category.image_url] : [],
     });
     setIsDialogOpen(true);
   };
@@ -166,12 +167,12 @@ const AdminCategories = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="image_url">Image URL</Label>
-                    <Input
-                      id="image_url"
+                    <Label>Category Image</Label>
+                    <ImageUpload
                       value={formData.image_url}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
+                      onChange={(urls) => setFormData({ ...formData, image_url: urls })}
+                      multiple={false}
+                      maxFiles={1}
                     />
                   </div>
                   <div className="flex justify-end gap-2">

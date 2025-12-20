@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
+import ImageUpload from '@/components/ImageUpload';
 
 interface Product {
   id: string;
@@ -45,7 +46,7 @@ const AdminProducts = () => {
     name_fr: '',
     description_ar: '',
     description_fr: '',
-    images: '',
+    images: [] as string[],
     rent_price: 0,
     sale_price: 0,
     sizes: '',
@@ -88,7 +89,7 @@ const AdminProducts = () => {
         name_fr: data.name_fr,
         description_ar: data.description_ar || null,
         description_fr: data.description_fr || null,
-        images: data.images.split(',').map(s => s.trim()).filter(Boolean),
+        images: data.images,
         rent_price: data.rent_price,
         sale_price: data.sale_price || null,
         sizes: data.sizes.split(',').map(s => s.trim()).filter(Boolean),
@@ -115,7 +116,7 @@ const AdminProducts = () => {
         name_fr: data.name_fr,
         description_ar: data.description_ar || null,
         description_fr: data.description_fr || null,
-        images: data.images.split(',').map(s => s.trim()).filter(Boolean),
+        images: data.images,
         rent_price: data.rent_price,
         sale_price: data.sale_price || null,
         sizes: data.sizes.split(',').map(s => s.trim()).filter(Boolean),
@@ -155,7 +156,7 @@ const AdminProducts = () => {
       name_fr: '',
       description_ar: '',
       description_fr: '',
-      images: '',
+      images: [],
       rent_price: 0,
       sale_price: 0,
       sizes: '',
@@ -174,7 +175,7 @@ const AdminProducts = () => {
       name_fr: product.name_fr,
       description_ar: product.description_ar || '',
       description_fr: product.description_fr || '',
-      images: product.images.join(', '),
+      images: product.images || [],
       rent_price: product.rent_price,
       sale_price: product.sale_price || 0,
       sizes: product.sizes.join(', '),
@@ -267,12 +268,11 @@ const AdminProducts = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="images">Image URLs (comma-separated)</Label>
-                    <Textarea
-                      id="images"
+                    <Label>Product Images</Label>
+                    <ImageUpload
                       value={formData.images}
-                      onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-                      placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                      onChange={(urls) => setFormData({ ...formData, images: urls })}
+                      maxFiles={5}
                     />
                   </div>
 
