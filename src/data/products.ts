@@ -8,6 +8,8 @@ import gallery2 from '@/assets/products/gallery-2.jpg';
 import gallery3 from '@/assets/products/gallery-3.jpg';
 import gallery4 from '@/assets/products/gallery-4.jpg';
 import gallery5 from '@/assets/products/gallery-5.jpg';
+import oxfordNoir from '@/assets/products/oxford-noir.jpg';
+import derbyMarron from '@/assets/products/derby-marron.jpg';
 
 export const products = [
   {
@@ -112,7 +114,7 @@ export const products = [
     nameFr: 'Oxford Noir',
     descriptionAr: 'حذاء أكسفورد كلاسيكي من الجلد الطبيعي. مثالي للمناسبات الرسمية والأعراس.',
     descriptionFr: 'Chaussure Oxford classique en cuir véritable. Parfait pour les occasions formelles et mariages.',
-    images: [gallery2, gallery1],
+    images: [oxfordNoir, gallery1],
     rentPrice: 3000,
     salePrice: 18000,
     sizes: ['40', '41', '42', '43', '44', '45'],
@@ -124,7 +126,7 @@ export const products = [
     nameFr: 'Derby Marron',
     descriptionAr: 'حذاء دربي أنيق بني من الجلد الفاخر. تصميم إيطالي راقي.',
     descriptionFr: 'Chaussure Derby élégante marron en cuir premium. Design italien raffiné.',
-    images: [gallery3, gallery2],
+    images: [derbyMarron, oxfordNoir],
     rentPrice: 3500,
     salePrice: 20000,
     sizes: ['40', '41', '42', '43', '44', '45'],
@@ -144,7 +146,7 @@ export const categories = [
     id: 'shoes',
     nameAr: 'أحذية',
     nameFr: 'Chaussures',
-    image: noirEtoile,
+    image: oxfordNoir,
     count: 2,
   },
   {
