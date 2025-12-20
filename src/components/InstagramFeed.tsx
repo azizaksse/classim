@@ -7,7 +7,7 @@ const InstagramFeed = () => {
   const { language } = useLanguage();
 
   const instagramHandle = '@classimo_';
-  const instagramUrl = 'https://www.instagram.com/classimo_/';
+  const instagramUrl = 'https://www.instagram.com/classimo_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==';
 
   return (
     <section className="py-20 bg-card/30">
