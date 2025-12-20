@@ -50,52 +50,9 @@ const Navbar = () => {
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       <div className="px-4 md:px-6">
-        <div className="flex items-center justify-between h-14 md:h-16">
-          {/* Desktop Navigation - Left side */}
-          <div className="hidden md:flex items-center gap-1 bg-secondary/50 rounded-xl p-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.key}
-                to={link.path}
-                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  isActive(link.path)
-                    ? 'text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {isActive(link.path) && (
-                  <motion.div
-                    layoutId="activeNav"
-                    className="absolute inset-0 bg-primary shadow-gold rounded-lg"
-                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                <span className="relative z-10">{t(link.key)}</span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Mobile spacer */}
-          <div className="md:hidden" />
-
-          {/* Logo - Center */}
-          <Link to="/" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-3 group flex-shrink-0">
-            <motion.div 
-              className={`w-9 h-9 md:w-11 md:h-11 rounded-full overflow-hidden border-2 transition-all duration-300 ${
-                scrolled ? 'border-primary' : 'border-primary/60'
-              } group-hover:border-primary group-hover:shadow-gold`}
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <img src={logo} alt="Classimo Logo" className="w-full h-full object-cover" />
-            </motion.div>
-            <span className={`hidden sm:block text-lg md:text-xl font-bold text-gradient-gold ${dir === 'rtl' ? 'font-arabic' : 'font-display'}`}>
-              {language === 'ar' ? 'كلاسيمو' : 'Classimo'}
-            </span>
-          </Link>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2 md:gap-3">
+        <div className="grid grid-cols-3 items-center h-14 md:h-16">
+          {/* Actions - Left in LTR, Right in RTL */}
+          <div className="flex items-center gap-2 md:gap-3 justify-start">
             {/* WhatsApp CTA - Desktop */}
             <motion.a
               href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
@@ -123,13 +80,56 @@ const Navbar = () => {
                 </span>
               </Button>
             </motion.div>
+          </div>
 
-            {/* Mobile Menu Toggle */}
+          {/* Logo - Center */}
+          <Link to="/" className="flex items-center justify-center gap-2 md:gap-3 group">
+            <motion.div 
+              className={`w-9 h-9 md:w-11 md:h-11 rounded-full overflow-hidden border-2 transition-all duration-300 ${
+                scrolled ? 'border-primary' : 'border-primary/60'
+              } group-hover:border-primary group-hover:shadow-gold`}
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <img src={logo} alt="Classimo Logo" className="w-full h-full object-cover" />
+            </motion.div>
+            <span className={`hidden sm:block text-lg md:text-xl font-bold text-gradient-gold ${dir === 'rtl' ? 'font-arabic' : 'font-display'}`}>
+              {language === 'ar' ? 'كلاسيمو' : 'Classimo'}
+            </span>
+          </Link>
+
+          {/* Desktop Navigation - Right in LTR, Left in RTL */}
+          <div className="hidden md:flex items-center justify-end gap-1 bg-secondary/50 rounded-xl p-1 w-fit ms-auto">
+            {navLinks.map((link) => (
+              <Link
+                key={link.key}
+                to={link.path}
+                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  isActive(link.path)
+                    ? 'text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {isActive(link.path) && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute inset-0 bg-primary shadow-gold rounded-lg"
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <span className="relative z-10">{t(link.key)}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile Menu Toggle - shown instead of nav on mobile */}
+          <div className="md:hidden flex justify-end">
+
             <motion.div whileTap={{ scale: 0.9 }}>
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden hover:bg-secondary/80 rounded-xl"
+                className="hover:bg-secondary/80 rounded-xl"
                 onClick={() => setIsOpen(!isOpen)}
               >
                 <AnimatePresence mode="wait">
