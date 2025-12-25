@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Globe, MessageCircle } from 'lucide-react';
+import { Menu, X, Globe, MessageCircle, Settings } from 'lucide-react';
 import logo from '@/assets/logo.jpg';
 
 const Navbar = () => {
   const { language, setLanguage, t, dir } = useLanguage();
+  const { isAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -124,6 +126,26 @@ const Navbar = () => {
                 <span className="relative z-10">{t(link.key)}</span>
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin')
+                    ? 'text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {location.pathname.startsWith('/admin') && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute inset-0 bg-primary shadow-gold rounded-lg"
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <Settings className="w-4 h-4 relative z-10" />
+                <span className="relative z-10">Admin</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Toggle - shown instead of nav on mobile */}
@@ -196,6 +218,28 @@ const Navbar = () => {
                   </motion.div>
                 ))}
                 
+                {/* Admin Link - Mobile */}
+                {isAdmin && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: navLinks.length * 0.1 }}
+                  >
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 font-medium ${
+                        location.pathname.startsWith('/admin')
+                          ? 'bg-primary text-primary-foreground shadow-gold'
+                          : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                      }`}
+                    >
+                      <Settings className="w-5 h-5" />
+                      Admin
+                    </Link>
+                  </motion.div>
+                )}
+                
                 {/* WhatsApp CTA - Mobile */}
                 <motion.a
                   href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
@@ -205,7 +249,7 @@ const Navbar = () => {
                   className="flex items-center justify-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-4 py-3 rounded-xl font-medium transition-all duration-300"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.3 }}
                 >
                   <MessageCircle className="w-5 h-5" />
                   {language === 'ar' ? 'تواصل عبر واتساب' : 'Contacter via WhatsApp'}
