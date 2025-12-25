@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MessageCircle, Phone, Mail } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { MessageCircle, Phone, Mail, Settings } from 'lucide-react';
 
 const Footer = () => {
   const { t, language } = useLanguage();
+  const { isAdmin } = useAuth();
 
   const whatsappNumber = '213795443714';
   const email = 'ganiislam452@gmail.com';
@@ -109,6 +111,14 @@ const Footer = () => {
                   {t('nav.contact')}
                 </Link>
               </li>
+              {isAdmin && (
+                <li>
+                  <Link to="/admin" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
+                    <Settings className="w-3.5 h-3.5" />
+                    Administration
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
