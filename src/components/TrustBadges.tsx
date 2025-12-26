@@ -27,14 +27,14 @@ const TrustBadges = () => {
           {badges.map((badge, index) => (
             <motion.div
               key={index}
-              className="flex items-center gap-3 px-4 py-2"
+              className="flex items-center gap-3 px-6 py-4 glass-card rounded-xl"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
               whileHover={{ scale: 1.05 }}
             >
-              <motion.div 
+              <motion.div
                 className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}

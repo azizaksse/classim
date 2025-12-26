@@ -26,7 +26,7 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return (
-    <motion.div 
+    <motion.div
       className="group glass-card rounded-xl overflow-hidden"
       whileHover={{ y: -8, transition: { duration: 0.3 } }}
     >
@@ -65,23 +65,31 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
         </Link>
 
         {/* Price */}
-        <div className="flex items-baseline gap-2 mb-3">
-          <span className="text-primary font-bold">
-            {rentPrice.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            / {t('product.rent')}
-          </span>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
+          <div className="flex items-baseline gap-1">
+            <span className="text-primary font-bold text-lg">
+              {rentPrice.toLocaleString()}
+            </span>
+            <span className="text-[10px] text-primary font-bold uppercase">
+              {language === 'ar' ? 'دج' : 'DA'}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium ml-1">
+              {t('product.rent')}
+            </span>
+          </div>
+
           {salePrice && (
-            <>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-foreground font-medium">
-                {salePrice.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
+            <div className="flex items-baseline gap-1 border-l border-border/50 pl-3">
+              <span className="text-foreground font-bold">
+                {salePrice.toLocaleString()}
               </span>
-              <span className="text-xs text-muted-foreground">
-                / {t('product.sale')}
+              <span className="text-[10px] text-muted-foreground font-bold uppercase">
+                {language === 'ar' ? 'دج' : 'DA'}
               </span>
-            </>
+              <span className="text-[10px] text-muted-foreground font-medium ml-1">
+                {t('product.sale')}
+              </span>
+            </div>
           )}
         </div>
 

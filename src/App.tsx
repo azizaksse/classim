@@ -10,6 +10,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AnimatePresence } from "framer-motion";
 import ScrollToTop from "@/components/ScrollToTop";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import { ThemeProvider } from "next-themes";
+import TrackingSection from "@/components/TrackingSection";
 
 // Lazy load all pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -17,11 +19,11 @@ const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
-const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
-const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
-const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminDashboard = lazy(() => import("./pages/admin-new/Dashboard"));
+const AdminProducts = lazy(() => import("./pages/admin-new/Products"));
+const AdminOrders = lazy(() => import("./pages/admin-new/Orders"));
+const AdminCustomers = lazy(() => import("./pages/admin-new/Customers"));
+const AdminSettings = lazy(() => import("./pages/admin-new/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -47,7 +49,7 @@ const PageLoader = () => (
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
       <Suspense fallback={<PageLoader />}>
@@ -59,8 +61,8 @@ const AnimatedRoutes = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/categories" element={<AdminCategories />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/customers" element={<AdminCustomers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -72,19 +74,22 @@ const AnimatedRoutes = () => {
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <LanguageProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <FloatingWhatsApp />
-              <AnimatedRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
-        </LanguageProvider>
-      </AuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <AuthProvider>
+          <LanguageProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <TrackingSection />
+                <FloatingWhatsApp />
+                <AnimatedRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </LanguageProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </HelmetProvider>
 );

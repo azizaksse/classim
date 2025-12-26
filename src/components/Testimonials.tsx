@@ -144,11 +144,10 @@ const StarRating = ({ rating }: { rating: number }) => {
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
-          className={`w-4 h-4 ${
-            star <= rating
+          className={`w-4 h-4 ${star <= rating
               ? 'fill-primary text-primary'
               : 'fill-muted text-muted'
-          }`}
+            }`}
         />
       ))}
     </div>
@@ -162,7 +161,7 @@ interface TestimonialCardProps {
 
 const TestimonialCard = ({ testimonial, language }: TestimonialCardProps) => {
   return (
-    <motion.div 
+    <motion.div
       className="glass-card rounded-2xl p-6 w-[300px] md:w-[350px] relative flex-shrink-0"
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
@@ -260,7 +259,7 @@ const Testimonials = () => {
                 </div>
 
                 {/* Review Text */}
-                <p className="text-foreground text-sm leading-relaxed mb-6">
+                <p className="text-foreground text-sm leading-relaxed mb-6 line-clamp-4">
                   {language === 'ar' ? testimonial.reviewAr : testimonial.reviewFr}
                 </p>
 
@@ -281,7 +280,7 @@ const Testimonials = () => {
 
       <div className="container mx-auto px-4">
         {/* Stats */}
-        <motion.div 
+        <motion.div
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
           variants={containerVariants}
           initial="hidden"

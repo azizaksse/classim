@@ -34,9 +34,9 @@ const ScrollToTop = () => {
         >
           <Button
             onClick={scrollToTop}
-            variant="gold"
+            variant="secondary"
             size="icon"
-            className="rounded-full w-12 h-12 shadow-gold hover:shadow-elegant transition-shadow"
+            className="rounded-full w-12 h-12 shadow-elegant hover:bg-primary hover:text-primary-foreground transition-all duration-300"
           >
             <ArrowUp className="w-5 h-5" />
           </Button>

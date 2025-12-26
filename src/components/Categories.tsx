@@ -23,22 +23,22 @@ const CategoryCard = ({ id, nameAr, nameFr, image, count, index }: CategoryCardP
       viewport={{ once: true, margin: '-50px' }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
     >
-      <Link 
+      <Link
         to={`/catalogue?category=${id}`}
-        className="group relative overflow-hidden rounded-2xl aspect-[4/5] block"
+        className="group relative overflow-hidden rounded-2xl aspect-[4/5] block glass-card"
       >
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${image})` }}
           whileHover={{ scale: 1.1 }}
           transition={{ duration: 0.6 }}
         />
-        
+
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-300" />
-        
+
         {/* Gold Border on Hover */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 border-2 border-transparent rounded-2xl"
           whileHover={{ borderColor: 'hsl(var(--primary) / 0.5)' }}
           transition={{ duration: 0.3 }}
@@ -46,7 +46,7 @@ const CategoryCard = ({ id, nameAr, nameFr, image, count, index }: CategoryCardP
 
         {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
-          <motion.h3 
+          <motion.h3
             className={`text-2xl font-bold text-foreground mb-2 ${language === 'ar' ? 'font-arabic' : 'font-display'}`}
             initial={{ y: 10, opacity: 0.8 }}
             whileHover={{ y: 0, opacity: 1 }}

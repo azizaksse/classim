@@ -66,6 +66,10 @@ export default {
         arabic: ['Cairo', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
       },
+      boxShadow: {
+        card: "var(--shadow-card)",
+        elegant: "var(--shadow-elegant)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

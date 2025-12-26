@@ -15,10 +15,10 @@ import Footer from '@/components/Footer';
 const Index = () => {
   const { language } = useLanguage();
 
-  const title = language === 'ar' 
-    ? 'كلاسيمو | كراء و بيع كوستيم الأفراح في الجزائر' 
+  const title = language === 'ar'
+    ? 'كلاسيمو | كراء و بيع كوستيم الأفراح في الجزائر'
     : 'Classimo | Location & Vente de Costumes de Mariage en Algérie';
-  
+
   const description = language === 'ar'
     ? 'موديلات فاخرة من كوستيم الأفراح للكراء والبيع. توصيل لكل ولايات الجزائر. دفع عند الاستلام.'
     : 'Modèles premium de costumes de mariage en location et vente. Livraison nationale en Algérie. Paiement à la livraison.';

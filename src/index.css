@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Almarai:wght@300;400;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +6,68 @@
 
 @layer base {
   :root {
+    /* Premium Light Theme */
+    --background: 40 30% 98%;
+    --foreground: 30 10% 4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 4%;
+
+    --primary: 45 85% 55%;
+    --primary-foreground: 40 30% 98%;
+
+    --secondary: 40 20% 94%;
+    --secondary-foreground: 30 10% 10%;
+
+    --muted: 40 10% 90%;
+    --muted-foreground: 30 5% 40%;
+
+    --accent: 45 85% 55%;
+    --accent-foreground: 40 30% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 40 30% 98%;
+
+    --border: 40 15% 90%;
+    --input: 40 15% 90%;
+    --ring: 45 85% 55%;
+
+    --radius: 0.5rem;
+
+    /* Custom Premium Colors */
+    --gold: 45 85% 55%;
+    --gold-light: 48 90% 60%;
+    --gold-dark: 42 80% 48%;
+    --gold-muted: 45 70% 50%;
+    --champagne: 38 35% 80%;
+    --ivory: 40 30% 96%;
+    --obsidian: 30 10% 4%;
+    --charcoal: 30 8% 12%;
+
+    --whatsapp: 142 70% 49%;
+    --whatsapp-hover: 142 70% 44%;
+
+    --cta-gold-from: 45 85% 55%;
+    --cta-gold-to: 42 80% 48%;
+
+    --gradient-gold: linear-gradient(135deg, hsl(45 85% 55%), hsl(48 90% 60%));
+    --gradient-cta: linear-gradient(135deg, hsl(45 85% 55%), hsl(42 80% 48%));
+    --gradient-dark: linear-gradient(180deg, hsl(30 10% 4%), hsl(30 8% 8%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(40 20% 98%));
+
+    --shadow-gold: 0 4px 20px -4px hsl(45 85% 55% / 0.4);
+    --shadow-elegant: 0 10px 40px -10px hsl(0 0% 0% / 0.15);
+    --shadow-card: 0 12px 30px -10px hsl(0 0% 0% / 0.2);
+
+    --font-display: 'Playfair Display', serif;
+    --font-arabic: 'Almarai', 'Cairo', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  .dark {
     /* Premium Black & Gold Theme */
     --background: 30 10% 4%;
     --foreground: 40 20% 95%;
@@ -35,41 +97,9 @@
     --input: 30 8% 15%;
     --ring: 40 45% 65%;
 
-    --radius: 0.5rem;
-
-    /* Custom Premium Colors - Modern Yellow Gold */
-    --gold: 45 85% 55%;
-    --gold-light: 48 90% 60%;
-    --gold-dark: 42 80% 48%;
-    --gold-muted: 45 70% 50%;
-    --champagne: 38 35% 80%;
-    --ivory: 40 30% 96%;
-    --obsidian: 30 10% 4%;
-    --charcoal: 30 8% 12%;
-    
-    /* WhatsApp Brand Color */
-    --whatsapp: 142 70% 49%;
-    --whatsapp-hover: 142 70% 44%;
-
-    /* CTA Gradient - Vibrant Yellow Gold */
-    --cta-gold-from: 45 85% 55%;
-    --cta-gold-to: 42 80% 48%;
-
-    /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(45 85% 55%), hsl(48 90% 60%));
-    --gradient-cta: linear-gradient(135deg, hsl(45 85% 55%), hsl(42 80% 48%));
-    --gradient-dark: linear-gradient(180deg, hsl(30 10% 4%), hsl(30 8% 8%));
     --gradient-card: linear-gradient(145deg, hsl(30 8% 10%), hsl(30 8% 6%));
-
-    /* Shadows */
-    --shadow-gold: 0 4px 20px -4px hsl(45 85% 55% / 0.4);
-    --shadow-elegant: 0 10px 40px -10px hsl(0 0% 0% / 0.5);
-    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.4);
-
-    /* Typography */
-    --font-display: 'Playfair Display', serif;
-    --font-arabic: 'Cairo', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --shadow-elegant: 0 20px 50px -12px hsl(0 0% 0% / 0.6);
+    --shadow-card: 0 15px 35px -12px hsl(0 0% 0% / 0.5);
   }
 
   * {
@@ -124,19 +154,8 @@
     box-shadow: var(--shadow-gold);
   }
 
-  .shadow-elegant {
-    box-shadow: var(--shadow-elegant);
-  }
-
   .glass-card {
-    @apply bg-card/80 backdrop-blur-md border border-border/50;
-  }
-
-  .floating-nav {
-    @apply fixed top-3 left-1/2 -translate-x-1/2 z-50;
-    @apply bg-card/90 backdrop-blur-xl;
-    @apply border border-border/50 rounded-2xl;
-    @apply shadow-elegant;
+    @apply bg-card/80 backdrop-blur-md border border-border/50 shadow-card;
   }
 }
 
@@ -154,29 +173,36 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes slideUp {
-    from { 
-      opacity: 0; 
-      transform: translateY(20px); 
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
-    to { 
-      opacity: 1; 
-      transform: translateY(0); 
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 
   @keyframes scaleIn {
-    from { 
-      opacity: 0; 
-      transform: scale(0.95); 
+    from {
+      opacity: 0;
+      transform: scale(0.95);
     }
-    to { 
-      opacity: 1; 
-      transform: scale(1); 
+
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
@@ -194,11 +220,12 @@
   }
 }
 
-/* Infinite marquee animation - placed outside @layer for global keyframes */
+/* Infinite marquee animation */
 @keyframes marquee {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -206,9 +233,12 @@
 
 /* Floating animation for logo */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-12px);
   }
