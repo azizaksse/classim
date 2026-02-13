@@ -1,0 +1,74 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+    store_settings: defineTable({
+        key: v.string(),
+        delivery_price: v.float64(),
+        delivery_prices_by_wilaya: v.optional(v.record(v.string(), v.float64())),
+        facebook_pixels: v.optional(v.array(v.string())),
+        updated_at: v.optional(v.string()),
+    }).index("by_key", ["key"]),
+    categories: defineTable({
+        name_ar: v.string(),
+        name_fr: v.string(),
+        image_url: v.optional(v.string()),
+        created_at: v.optional(v.string()),
+        updated_at: v.optional(v.string()),
+    }),
+    products: defineTable({
+        category_id: v.optional(v.id("categories")),
+        name_ar: v.string(),
+        name_fr: v.string(),
+        description_ar: v.optional(v.string()),
+        description_fr: v.optional(v.string()),
+        rent_price: v.float64(),
+        sale_price: v.optional(v.float64()),
+        images: v.optional(v.array(v.string())),
+        sizes: v.optional(v.array(v.string())),
+        colors: v.optional(v.array(v.string())),
+        is_active: v.optional(v.boolean()),
+        is_featured: v.optional(v.boolean()),
+        created_at: v.optional(v.string()),
+        updated_at: v.optional(v.string()),
+    }).index("by_category", ["category_id"]),
+    orders: defineTable({
+        product_name: v.string(),
+        size: v.optional(v.string()),
+        color: v.optional(v.string()),
+        quantity: v.float64(),
+        customer_name: v.string(),
+        phone: v.string(),
+        wilaya_code: v.string(),
+        wilaya_name: v.optional(v.string()),
+        city: v.string(),
+        delivery_place: v.union(v.literal("home"), v.literal("desktop")),
+        delivery_price: v.float64(),
+        language: v.union(v.literal("ar"), v.literal("fr")),
+        source: v.string(),
+        status: v.union(
+            v.literal("pending"),
+            v.literal("confirmed"),
+            v.literal("cancelled"),
+            v.literal("approved"),
+            v.literal("processing"),
+            v.literal("delivered")
+        ),
+        syncStatus: v.optional(v.union(v.literal("pending"), v.literal("success"), v.literal("failed"))),
+        created_at: v.string(),
+    })
+        .index("by_phone", ["phone"])
+        .index("by_created_at", ["created_at"]),
+    profiles: defineTable({
+        user_id: v.string(),
+        full_name: v.optional(v.string()),
+        email: v.optional(v.string()),
+        created_at: v.optional(v.string()),
+        updated_at: v.optional(v.string()),
+    }).index("by_user_id", ["user_id"]),
+    user_roles: defineTable({
+        user_id: v.string(),
+        role: v.union(v.literal("admin"), v.literal("moderator"), v.literal("user")),
+        created_at: v.optional(v.string()),
+    }).index("by_user_id", ["user_id"]),
+});

@@ -1,6 +1,10 @@
+import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { AdminLayout } from "@/components/admin-new/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
@@ -19,12 +23,100 @@ import {
   Store,
   Bell,
   Shield,
-  CreditCard,
-  Palette,
   Camera,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { WILAYAS } from "@/constants/wilayas";
 
 const Settings = () => {
+  const { toast } = useToast();
+  const storeSettings = useQuery(api.settings.get);
+  const upsertStoreSettings = useMutation(api.settings.upsertStoreSettings);
+  const [deliveryPrice, setDeliveryPrice] = useState("0");
+  const [deliveryPricesByWilaya, setDeliveryPricesByWilaya] = useState<Record<string, string>>({});
+  const [facebookPixelsText, setFacebookPixelsText] = useState("");
+
+  useEffect(() => {
+    if (storeSettings) {
+      setDeliveryPrice(String(storeSettings.delivery_price ?? 0));
+      const mappedValues: Record<string, string> = {};
+      for (const w of WILAYAS) {
+        const value = storeSettings.delivery_prices_by_wilaya?.[w.code];
+        mappedValues[w.code] = value === undefined ? "" : String(value);
+      }
+      setDeliveryPricesByWilaya(mappedValues);
+      setFacebookPixelsText((storeSettings.facebook_pixels ?? []).join("\n"));
+    }
+  }, [storeSettings]);
+
+  const onWilayaPriceChange = (code: string, value: string) => {
+    setDeliveryPricesByWilaya((prev) => ({
+      ...prev,
+      [code]: value,
+    }));
+  };
+
+  const saveStoreSettings = async () => {
+    const parsedPrice = Number(deliveryPrice);
+    if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+      toast({
+        title: "Invalid delivery price",
+        description: "Please enter a valid positive number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const parsedByWilaya: Record<string, number> = {};
+    for (const w of WILAYAS) {
+      const rawValue = deliveryPricesByWilaya[w.code]?.trim();
+      if (!rawValue) {
+        continue;
+      }
+
+      const parsed = Number(rawValue);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        toast({
+          title: "Invalid wilaya delivery price",
+          description: `Please enter a valid price for wilaya ${w.code}.`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      parsedByWilaya[w.code] = parsed;
+    }
+
+    const facebookPixels = Array.from(
+      new Set(
+        facebookPixelsText
+          .split(/[\n,]+/)
+          .map((id) => id.trim())
+          .filter(Boolean)
+      )
+    );
+
+    try {
+      await upsertStoreSettings({
+        delivery_price: parsedPrice,
+        delivery_prices_by_wilaya: parsedByWilaya,
+        facebook_pixels: facebookPixels,
+      });
+      toast({
+        title: "Settings saved",
+        description: "Delivery prices and Facebook Pixel settings have been updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to save settings",
+        description: error?.message ?? "Unknown error",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const currentDeliveryPrice = storeSettings?.delivery_price ?? (Number(deliveryPrice) || 0);
+
   return (
     <AdminLayout>
       <div className="space-y-6 animate-fade-in">
@@ -38,7 +130,20 @@ const Settings = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="profile" className="space-y-6">
+        <Card className="card-luxury">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-heading">Delivery Price</CardTitle>
+            <CardDescription>Visible quick view for your current store delivery fee</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="inline-flex items-center gap-2 rounded-lg bg-accent/10 px-4 py-2">
+              <span className="text-sm text-muted-foreground">Current:</span>
+              <span className="text-lg font-semibold text-accent">{currentDeliveryPrice.toLocaleString()} DA</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="store" className="space-y-6">
           <TabsList className="bg-secondary/50 p-1">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4" />
@@ -161,6 +266,72 @@ const Settings = () => {
                 <Separator />
 
                 <div className="space-y-4">
+                  <h4 className="font-medium">Delivery Pricing</h4>
+                  <div className="space-y-2 max-w-sm">
+                    <div className="space-y-2">
+                      <Label htmlFor="delivery_price">Delivery Price (DA)</Label>
+                      <Input
+                        id="delivery_price"
+                        type="number"
+                        min={0}
+                        step="1"
+                        className="input-luxury"
+                        value={deliveryPrice}
+                        onChange={(e) => setDeliveryPrice(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Default price used when a wilaya-specific price is empty.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h5 className="text-sm font-medium">Price By Wilaya (DA)</h5>
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {WILAYAS.map((w) => (
+                        <div key={w.code} className="space-y-1">
+                          <Label htmlFor={`delivery_price_${w.code}`} className="text-xs">
+                            {w.code} - {w.nameFr}
+                          </Label>
+                          <Input
+                            id={`delivery_price_${w.code}`}
+                            type="number"
+                            min={0}
+                            step="1"
+                            className="input-luxury"
+                            value={deliveryPricesByWilaya[w.code] ?? ""}
+                            onChange={(e) => onWilayaPriceChange(w.code, e.target.value)}
+                            placeholder={deliveryPrice || "0"}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">Facebook Pixel IDs</h4>
+                  <div className="space-y-2">
+                    <Label htmlFor="facebook_pixels">
+                      Pixel IDs (one per line or comma separated)
+                    </Label>
+                    <Textarea
+                      id="facebook_pixels"
+                      value={facebookPixelsText}
+                      onChange={(e) => setFacebookPixelsText(e.target.value)}
+                      className="input-luxury min-h-[110px]"
+                      placeholder={"123456789012345\n987654321098765"}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Add multiple Facebook Pixel IDs to track all client ad accounts.
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
                   <h4 className="font-medium">Store Features</h4>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -194,7 +365,10 @@ const Settings = () => {
                 </div>
 
                 <div className="flex justify-end">
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+                  <Button
+                    className="bg-accent text-accent-foreground hover:bg-accent/90"
+                    onClick={saveStoreSettings}
+                  >
                     Save Changes
                   </Button>
                 </div>

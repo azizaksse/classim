@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useAction, useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { useForm } from 'react-hook-form';
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,73 +25,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { MessageCircle, User, MapPin, Phone, Building, Home, Tag } from 'lucide-react';
+import { ShoppingCart, User, MapPin, Phone, Building, Home } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { WILAYAS } from '@/constants/wilayas';
 
 interface LeadFormProps {
   productName: string;
+  unitPrice: number;
   selectedSize?: string | null;
+  selectedColor?: string | null;
+  selectedQuantity?: number;
 }
-
-const wilayas = [
-  { code: '01', nameAr: 'أدرار', nameFr: 'Adrar' },
-  { code: '02', nameAr: 'الشلف', nameFr: 'Chlef' },
-  { code: '03', nameAr: 'الأغواط', nameFr: 'Laghouat' },
-  { code: '04', nameAr: 'أم البواقي', nameFr: 'Oum El Bouaghi' },
-  { code: '05', nameAr: 'باتنة', nameFr: 'Batna' },
-  { code: '06', nameAr: 'بجاية', nameFr: 'Béjaïa' },
-  { code: '07', nameAr: 'بسكرة', nameFr: 'Biskra' },
-  { code: '08', nameAr: 'بشار', nameFr: 'Béchar' },
-  { code: '09', nameAr: 'البليدة', nameFr: 'Blida' },
-  { code: '10', nameAr: 'البويرة', nameFr: 'Bouira' },
-  { code: '11', nameAr: 'تمنراست', nameFr: 'Tamanrasset' },
-  { code: '12', nameAr: 'تبسة', nameFr: 'Tébessa' },
-  { code: '13', nameAr: 'تلمسان', nameFr: 'Tlemcen' },
-  { code: '14', nameAr: 'تيارت', nameFr: 'Tiaret' },
-  { code: '15', nameAr: 'تيزي وزو', nameFr: 'Tizi Ouzou' },
-  { code: '16', nameAr: 'الجزائر', nameFr: 'Alger' },
-  { code: '17', nameAr: 'الجلفة', nameFr: 'Djelfa' },
-  { code: '18', nameAr: 'جيجل', nameFr: 'Jijel' },
-  { code: '19', nameAr: 'سطيف', nameFr: 'Sétif' },
-  { code: '20', nameAr: 'سعيدة', nameFr: 'Saïda' },
-  { code: '21', nameAr: 'سكيكدة', nameFr: 'Skikda' },
-  { code: '22', nameAr: 'سيدي بلعباس', nameFr: 'Sidi Bel Abbès' },
-  { code: '23', nameAr: 'عنابة', nameFr: 'Annaba' },
-  { code: '24', nameAr: 'قالمة', nameFr: 'Guelma' },
-  { code: '25', nameAr: 'قسنطينة', nameFr: 'Constantine' },
-  { code: '26', nameAr: 'المدية', nameFr: 'Médéa' },
-  { code: '27', nameAr: 'مستغانم', nameFr: 'Mostaganem' },
-  { code: '28', nameAr: 'المسيلة', nameFr: "M'Sila" },
-  { code: '29', nameAr: 'معسكر', nameFr: 'Mascara' },
-  { code: '30', nameAr: 'ورقلة', nameFr: 'Ouargla' },
-  { code: '31', nameAr: 'وهران', nameFr: 'Oran' },
-  { code: '32', nameAr: 'البيض', nameFr: 'El Bayadh' },
-  { code: '33', nameAr: 'إليزي', nameFr: 'Illizi' },
-  { code: '34', nameAr: 'برج بوعريريج', nameFr: 'Bordj Bou Arréridj' },
-  { code: '35', nameAr: 'بومرداس', nameFr: 'Boumerdès' },
-  { code: '36', nameAr: 'الطارف', nameFr: 'El Tarf' },
-  { code: '37', nameAr: 'تندوف', nameFr: 'Tindouf' },
-  { code: '38', nameAr: 'تيسمسيلت', nameFr: 'Tissemsilt' },
-  { code: '39', nameAr: 'الوادي', nameFr: 'El Oued' },
-  { code: '40', nameAr: 'خنشلة', nameFr: 'Khenchela' },
-  { code: '41', nameAr: 'سوق أهراس', nameFr: 'Souk Ahras' },
-  { code: '42', nameAr: 'تيبازة', nameFr: 'Tipaza' },
-  { code: '43', nameAr: 'ميلة', nameFr: 'Mila' },
-  { code: '44', nameAr: 'عين الدفلى', nameFr: 'Aïn Defla' },
-  { code: '45', nameAr: 'النعامة', nameFr: 'Naâma' },
-  { code: '46', nameAr: 'عين تموشنت', nameFr: 'Aïn Témouchent' },
-  { code: '47', nameAr: 'غرداية', nameFr: 'Ghardaïa' },
-  { code: '48', nameAr: 'غليزان', nameFr: 'Relizane' },
-  { code: '49', nameAr: 'تيميمون', nameFr: 'Timimoun' },
-  { code: '50', nameAr: 'برج باجي مختار', nameFr: 'Bordj Badji Mokhtar' },
-  { code: '51', nameAr: 'أولاد جلال', nameFr: 'Ouled Djellal' },
-  { code: '52', nameAr: 'بني عباس', nameFr: 'Béni Abbès' },
-  { code: '53', nameAr: 'عين صالح', nameFr: 'In Salah' },
-  { code: '54', nameAr: 'عين قزام', nameFr: 'In Guezzam' },
-  { code: '55', nameAr: 'توقرت', nameFr: 'Touggourt' },
-  { code: '56', nameAr: 'جانت', nameFr: 'Djanet' },
-  { code: '57', nameAr: 'المغير', nameFr: "El M'Ghair" },
-  { code: '58', nameAr: 'المنيعة', nameFr: 'El Meniaa' },
-];
 
 // Validation messages
 const getValidationMessages = (language: 'ar' | 'fr') => ({
@@ -147,7 +93,7 @@ const createFormSchema = (language: 'ar' | 'fr') => {
         required_error: messages.deliveryPlace.required,
       }),
     orderType: z
-      .enum(['rent', 'sale'], {
+      .enum(['sale'], {
         required_error: messages.orderType.required,
       }),
   });
@@ -155,9 +101,17 @@ const createFormSchema = (language: 'ar' | 'fr') => {
 
 type FormData = z.infer<ReturnType<typeof createFormSchema>>;
 
-const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
+const LeadForm = ({ productName, unitPrice, selectedSize, selectedColor, selectedQuantity = 1 }: LeadFormProps) => {
   const { language } = useLanguage();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showTotal, setShowTotal] = useState(false);
+  const [botField, setBotField] = useState("");
+  const storeSettings = useQuery(api.settings.get);
+  const submitOrder = useAction(api.orders.submit);
+  const defaultDeliveryPrice = storeSettings?.delivery_price ?? 0;
+  const deliveryPricesByWilaya = storeSettings?.delivery_prices_by_wilaya ?? {};
 
   const formSchema = createFormSchema(language);
 
@@ -169,75 +123,77 @@ const LeadForm = ({ productName, selectedSize }: LeadFormProps) => {
       wilaya: '',
       city: '',
       deliveryPlace: 'home',
-      orderType: 'rent',
+      orderType: 'sale',
     },
     mode: 'onBlur',
   });
+  const selectedWilayaCode = form.watch("wilaya");
+  const deliveryPrice = selectedWilayaCode
+    ? (deliveryPricesByWilaya[selectedWilayaCode] ?? defaultDeliveryPrice)
+    : defaultDeliveryPrice;
+  const subtotal = unitPrice * selectedQuantity;
+  const total = subtotal + deliveryPrice;
 
-  const whatsappNumber = '213795443714';
-
-  const getWhatsAppUrl = (data: FormData) => {
-    const selectedWilaya = wilayas.find(w => w.code === data.wilaya);
-    const wilayaName = selectedWilaya 
-      ? (language === 'ar' ? selectedWilaya.nameAr : selectedWilaya.nameFr)
-      : '';
-    
-    const deliveryPlaceText = language === 'ar'
-      ? (data.deliveryPlace === 'home' ? 'المنزل' : 'المكتب')
-      : (data.deliveryPlace === 'home' ? 'Domicile' : 'Bureau');
-
-    const orderTypeText = language === 'ar'
-      ? (data.orderType === 'rent' ? 'كراء' : 'شراء')
-      : (data.orderType === 'rent' ? 'Location' : 'Achat');
-
-    const message = language === 'ar'
-      ? `السلام عليكم، أريد حجز:
-📦 المنتج: ${productName}
-📏 المقاس: ${selectedSize || 'غير محدد'}
-🏷️ نوع الطلب: ${orderTypeText}
-
-👤 الاسم: ${data.name}
-📱 الهاتف: ${data.phone}
-🏙️ الولاية: ${wilayaName}
-🏘️ المدينة: ${data.city}
-📍 مكان التوصيل: ${deliveryPlaceText}
-
-شكراً لكم`
-      : `Bonjour, je souhaite réserver:
-📦 Produit: ${productName}
-📏 Taille: ${selectedSize || 'Non spécifiée'}
-🏷️ Type de commande: ${orderTypeText}
-
-👤 Nom: ${data.name}
-📱 Téléphone: ${data.phone}
-🏙️ Wilaya: ${wilayaName}
-🏘️ Ville: ${data.city}
-📍 Lieu de livraison: ${deliveryPlaceText}
-
-Merci`;
-
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-  };
-
-  const { toast } = useToast();
-
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
-    const url = getWhatsAppUrl(data);
-    window.open(url, '_blank');
-    
-    // Show success toast
-    toast({
-      title: language === 'ar' ? '✓ تم إرسال الطلب' : '✓ Commande envoyée',
-      description: language === 'ar' 
-        ? 'سيتم التواصل معك قريباً عبر واتساب'
-        : 'Nous vous contacterons bientôt via WhatsApp',
-      duration: 5000,
-    });
-    
-    // Reset form after successful submission
+    try {
+      const selectedWilaya = WILAYAS.find((w) => w.code === data.wilaya);
+      const wilayaName = selectedWilaya
+        ? (language === 'ar' ? selectedWilaya.nameAr : selectedWilaya.nameFr)
+        : '';
+
+      await submitOrder({
+        product_name: productName,
+        size: selectedSize || undefined,
+        color: selectedColor || undefined,
+        quantity: selectedQuantity,
+        customer_name: data.name,
+        phone: data.phone,
+        wilaya_code: data.wilaya,
+        wilaya_name: wilayaName || undefined,
+        city: data.city,
+        delivery_place: data.deliveryPlace,
+        delivery_price: deliveryPrice,
+        language,
+        source: 'website_checkout_form',
+        // Use a stable epoch value to avoid client/server clock skew false positives.
+        form_started_at: 0,
+        bot_field: botField,
+      });
+    } catch (error: any) {
+      console.error('Order submission failed:', error);
+      const rawMessage = String(error?.message || '');
+      let description = language === 'ar'
+        ? 'تأكد من المعلومات وحاول مرة أخرى.'
+        : 'Please verify your data and try again.';
+
+      if (rawMessage.includes('Too many attempts')) {
+        description = language === 'ar'
+          ? 'عدد المحاولات كبير. حاول بعد قليل.'
+          : 'Too many attempts. Please try again later.';
+      } else if (rawMessage.includes('Invalid phone number')) {
+        description = language === 'ar'
+          ? 'رقم الهاتف غير صحيح.'
+          : 'Phone number is invalid.';
+      } else if (rawMessage.includes('Please complete the form normally')) {
+        description = language === 'ar'
+          ? 'املأ النموذج ثم أعد المحاولة.'
+          : 'Please fill the form normally and try again.';
+      }
+
+      toast({
+        title: language === 'ar' ? 'تعذر إرسال الطلب' : 'Failed to submit order',
+        description,
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     form.reset();
+    setBotField("");
     setIsSubmitting(false);
+    navigate("/thank-you", { state: { productName } });
   };
 
   return (
@@ -311,7 +267,7 @@ Merci`;
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="bg-card border-border max-h-[300px] z-50">
-                    {wilayas.map((w) => (
+                    {WILAYAS.map((w) => (
                       <SelectItem 
                         key={w.code} 
                         value={w.code}
@@ -386,57 +342,71 @@ Merci`;
             )}
           />
 
-          {/* Order Type (Rent/Sale) */}
-          <FormField
-            control={form.control}
-            name="orderType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2 text-foreground">
-                  <Tag className="w-4 h-4 text-primary" />
-                  {language === 'ar' ? 'نوع الطلب' : 'Type de commande'}
-                </FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    className="flex gap-4"
-                  >
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <RadioGroupItem value="rent" id="rent" className="border-primary text-primary" />
-                      <Label htmlFor="rent" className="cursor-pointer text-foreground">
-                        {language === 'ar' ? 'كراء' : 'Location'}
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <RadioGroupItem value="sale" id="sale" className="border-primary text-primary" />
-                      <Label htmlFor="sale" className="cursor-pointer text-foreground">
-                        {language === 'ar' ? 'شراء' : 'Achat'}
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage className="text-destructive text-sm" />
-              </FormItem>
-            )}
+          <input type="hidden" value="sale" {...form.register("orderType")} />
+          <input
+            type="text"
+            value={botField}
+            onChange={(e) => setBotField(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            className="hidden"
+            aria-hidden="true"
           />
 
           <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="w-full"
+            onClick={() => setShowTotal(true)}
+          >
+            {language === 'ar' ? 'حساب السعر الإجمالي' : 'Calculer le prix total'}
+          </Button>
+
+          {showTotal && (
+            <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {language === 'ar' ? `سعر المنتج x ${selectedQuantity}` : `Produit x ${selectedQuantity}`}
+                </span>
+                <span className="font-medium">
+                  {subtotal.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {language === 'ar' ? 'سعر التوصيل' : 'Livraison'}
+                </span>
+                <span className="font-medium">
+                  {deliveryPrice.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
+                </span>
+              </div>
+              <div className="h-px bg-border" />
+              <div className="flex items-center justify-between text-base font-semibold">
+                <span>{language === 'ar' ? 'المبلغ الإجمالي' : 'Total a payer'}</span>
+                <span className="text-primary">
+                  {total.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <Button
             type="submit"
-            variant="whatsapp"
+            variant="gold"
             size="lg"
             className="w-full mt-4"
             disabled={isSubmitting}
           >
-            <MessageCircle className="w-5 h-5" />
-            {language === 'ar' ? 'أرسل الطلب عبر واتساب' : 'Envoyer via WhatsApp'}
+            <ShoppingCart className="w-5 h-5" />
+            {language === 'ar' ? 'تأكيد الطلب' : 'Confirmer la commande'}
           </Button>
 
           {/* Trust note */}
           <p className="text-xs text-muted-foreground text-center">
             {language === 'ar' 
-              ? '✓ دفع عند الاستلام • ✓ توصيل لكل الولايات'
-              : '✓ Paiement à la livraison • ✓ Livraison nationale'}
+              ? `✓ الدفع عند الاستلام • اختر الولاية ثم اضغط حساب السعر الإجمالي`
+              : `✓ Paiement a la livraison • Choisissez la wilaya puis calculez le total`}
           </p>
         </form>
       </Form>

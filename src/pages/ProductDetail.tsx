@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,21 +7,25 @@ import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SizeCalculator from '@/components/SizeCalculator';
+import DeferredSection from '@/components/DeferredSection';
 import LeadForm from '@/components/LeadForm';
 import { Button } from '@/components/ui/button';
 import { Truck, CreditCard, ArrowLeft, ArrowRight } from 'lucide-react';
-import { products } from '@/data/products';
+import { useStoreProducts } from '@/hooks/useStoreProducts';
+const SizeCalculator = lazy(() => import('@/components/SizeCalculator'));
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { language, t, dir } = useLanguage();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
+  const { products, isLoading } = useStoreProducts();
   const product = products.find(p => p.id === id);
 
-  if (!product) {
+  if (!product && !isLoading) {
     return (
       <>
         <Navbar />
@@ -45,8 +49,38 @@ const ProductDetail = () => {
     );
   }
 
+  if (!product) {
+    return (
+      <>
+        <Navbar />
+        <PageTransition>
+          <main className="min-h-screen bg-background">
+            <div className="pt-32 pb-20 text-center">
+              <h1 className="text-2xl text-muted-foreground">
+                {language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}
+              </h1>
+            </div>
+            <Footer />
+          </main>
+        </PageTransition>
+      </>
+    );
+  }
+
   const productName = language === 'ar' ? product.nameAr : product.nameFr;
   const productDescription = language === 'ar' ? product.descriptionAr : product.descriptionFr;
+  const images = useMemo(
+    () => (Array.isArray(product.images) && product.images.length ? product.images : ["/placeholder.svg"]),
+    [product.images]
+  );
+  const sizes = useMemo(() => (Array.isArray(product.sizes) ? product.sizes : []), [product.sizes]);
+  const colors = useMemo(() => (Array.isArray(product.colors) ? product.colors : []), [product.colors]);
+
+  useEffect(() => {
+    if (selectedImage >= images.length) {
+      setSelectedImage(0);
+    }
+  }, [images.length, selectedImage]);
 
   return (
     <>
@@ -84,9 +118,12 @@ const ProductDetail = () => {
                     <AnimatePresence mode="wait">
                       <motion.img
                         key={selectedImage}
-                        src={product.images[selectedImage]}
+                        src={images[selectedImage]}
                         alt={productName}
                         className="w-full h-full object-cover"
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -96,9 +133,9 @@ const ProductDetail = () => {
                   </motion.div>
 
                   {/* Thumbnails */}
-                  {product.images.length > 1 && (
+                  {images.length > 1 && (
                     <div className="flex gap-3">
-                      {product.images.map((img, index) => (
+                      {images.map((img, index) => (
                         <motion.button
                           key={index}
                           onClick={() => setSelectedImage(index)}
@@ -108,7 +145,15 @@ const ProductDetail = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
-                          <img src={img} alt="" className="w-full h-full object-cover" />
+                          <img
+                            src={img}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                            width={80}
+                            height={96}
+                          />
                         </motion.button>
                       ))}
                     </div>
@@ -134,26 +179,16 @@ const ProductDetail = () => {
                         {product.rentPrice.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
                       </span>
                       <span className="text-sm text-muted-foreground ms-2">
-                        / {t('product.rent')}
+                        {language === 'ar' ? 'السعر' : 'Prix'}
                       </span>
                     </div>
-                    {product.salePrice && (
-                      <div>
-                        <span className="text-2xl font-semibold text-foreground">
-                          {product.salePrice.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
-                        </span>
-                        <span className="text-sm text-muted-foreground ms-2">
-                          / {t('product.sale')}
-                        </span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Sizes */}
                   <div>
                     <h3 className="font-medium text-foreground mb-3">{t('product.sizes')}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {product.sizes.map((size) => (
+                      {sizes.map((size) => (
                         <motion.button
                           key={size}
                           onClick={() => setSelectedSize(size)}
@@ -168,6 +203,60 @@ const ProductDetail = () => {
                           {size}
                         </motion.button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Colors */}
+                  {colors.length > 0 && (
+                    <div>
+                      <h3 className="font-medium text-foreground mb-3">
+                        {language === 'ar' ? 'الألوان المتوفرة' : 'Couleurs disponibles'}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {colors.map((color) => (
+                          <motion.button
+                            key={color}
+                            onClick={() => setSelectedColor(color)}
+                            className={`px-4 py-2 rounded-lg border transition-colors ${
+                              selectedColor === color
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-secondary border-border hover:border-primary text-foreground'
+                            }`}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {color}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quantity */}
+                  <div>
+                    <h3 className="font-medium text-foreground mb-3">
+                      {language === 'ar' ? 'الكمية' : 'Quantite'}
+                    </h3>
+                    <div className="inline-flex items-center rounded-lg border border-border bg-secondary">
+                      <button
+                        type="button"
+                        className="px-3 py-2 text-lg"
+                        onClick={() => setSelectedQuantity((q) => Math.max(1, q - 1))}
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <span className="px-4 py-2 min-w-[48px] text-center font-semibold">
+                        {selectedQuantity}
+                      </span>
+                      <button
+                        type="button"
+                        className="px-3 py-2 text-lg"
+                        onClick={() => setSelectedQuantity((q) => Math.min(10, q + 1))}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
 
@@ -196,14 +285,21 @@ const ProductDetail = () => {
                   {/* Lead Form */}
                   <LeadForm 
                     productName={productName} 
+                    unitPrice={product.rentPrice}
                     selectedSize={selectedSize} 
+                    selectedColor={selectedColor}
+                    selectedQuantity={selectedQuantity}
                   />
                 </AnimatedSection>
               </div>
 
               {/* Size Calculator */}
               <div className="mt-20">
-                <SizeCalculator />
+                <DeferredSection minHeight={520}>
+                  <Suspense fallback={<div className="min-h-[520px]" />}>
+                    <SizeCalculator />
+                  </Suspense>
+                </DeferredSection>
               </div>
             </div>
           </div>
