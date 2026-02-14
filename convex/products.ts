@@ -48,6 +48,8 @@ export const get = query({
 
                 return {
                     ...product,
+                    sale_percentage: product.sale_percentage ?? 0,
+                    stock: product.stock ?? 0,
                     category_name: categoryName,
                     images: images.map(i => i.url).filter(Boolean),
                     image_data: images,
@@ -155,5 +157,35 @@ export const remove = mutation({
     args: { id: v.id("products") },
     handler: async (ctx, args) => {
         await ctx.db.delete(args.id);
+    },
+});
+
+export const backfillMissingFields = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const products = await ctx.db.query("products").collect();
+        let updated = 0;
+
+        for (const product of products) {
+            const updates: Record<string, number | string> = {};
+
+            if (product.sale_percentage === undefined) {
+                updates.sale_percentage = 0;
+            }
+            if (product.stock === undefined) {
+                updates.stock = 0;
+            }
+            if (product.sale_price === undefined) {
+                updates.sale_price = product.rent_price;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                updates.updated_at = new Date().toISOString();
+                await ctx.db.patch(product._id, updates);
+                updated += 1;
+            }
+        }
+
+        return { total: products.length, updated };
     },
 });

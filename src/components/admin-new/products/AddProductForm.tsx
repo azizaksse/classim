@@ -15,6 +15,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -158,6 +159,11 @@ export const AddProductForm = ({
           <DialogTitle className="font-heading text-2xl">
             {product ? "Edit Product" : "Add New Product"}
           </DialogTitle>
+          <DialogDescription>
+            {product
+              ? "Update product details, pricing, stock, sizes, and colors."
+              : "Create a new product with pricing, stock, sizes, and colors."}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
