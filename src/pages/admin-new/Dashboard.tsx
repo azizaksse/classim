@@ -8,8 +8,10 @@ import { RevenueChart } from "@/components/admin-new/dashboard/RevenueChart";
 import { RecentCustomers } from "@/components/admin-new/dashboard/RecentOrders";
 import { TopProducts } from "@/components/admin-new/dashboard/TopProducts";
 import { FolderOpen, Users, Package, CheckCircle2 } from "lucide-react";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 const Dashboard = () => {
+  const { t } = useAdminLanguage();
   const productsData = useConvexQuery(api.products.get);
   const categoriesData = useConvexQuery(api.categories.get);
 
@@ -44,8 +46,8 @@ const Dashboard = () => {
       if (error) throw error;
       return (data || []).map((row: any) => ({
         id: row.id,
-        name: row.full_name || "Anonymous",
-        email: row.email || "No email",
+        name: row.full_name || "-",
+        email: row.email || "-",
         created_at: row.created_at,
       }));
     },
@@ -57,32 +59,32 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <h1 className="text-2xl font-heading font-semibold tracking-tight sm:text-3xl">
-            Dashboard
+            {t("dashboard.title")}
           </h1>
           <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
-            Welcome back! Here's what's happening with your store.
+            {t("dashboard.welcome")}
           </p>
         </div>
 
         {/* Metrics Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
-            title="Total Products"
+            title={t("dashboard.totalProducts")}
             value={productsLoading ? "..." : products.length.toString()}
             icon={<Package className="h-5 w-5" />}
           />
           <MetricCard
-            title="Active Products"
+            title={t("dashboard.activeProducts")}
             value={productsLoading ? "..." : activeProductsCount.toString()}
             icon={<CheckCircle2 className="h-5 w-5" />}
           />
           <MetricCard
-            title="Total Customers"
+            title={t("dashboard.totalCustomers")}
             value={usersLoading ? "..." : usersCount.toString()}
             icon={<Users className="h-5 w-5" />}
           />
           <MetricCard
-            title="Categories"
+            title={t("dashboard.categories")}
             value={categoriesLoading ? "..." : categories.length.toString()}
             icon={<FolderOpen className="h-5 w-5" />}
           />

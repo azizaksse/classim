@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminLanguageProvider } from "@/contexts/AdminLanguageContext";
 import { AnimatePresence } from "framer-motion";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "next-themes";
@@ -133,17 +134,19 @@ const App = () => {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
             <AuthProvider>
-              <LanguageProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
-                    <ScrollToTop />
-                    <Overlays />
-                    <AnimatedRoutes />
-                  </BrowserRouter>
-                </TooltipProvider>
-              </LanguageProvider>
+              <AdminLanguageProvider>
+                <LanguageProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                      <ScrollToTop />
+                      <Overlays />
+                      <AnimatedRoutes />
+                    </BrowserRouter>
+                  </TooltipProvider>
+                </LanguageProvider>
+              </AdminLanguageProvider>
             </AuthProvider>
           </ThemeProvider>
         </QueryClientProvider>

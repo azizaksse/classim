@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 import {
   Tooltip,
   TooltipContent,
@@ -24,12 +25,12 @@ import {
 } from "@/components/ui/tooltip";
 
 const navItems = [
-  { title: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { title: "Products", icon: Package, href: "/admin/products" },
-  { title: "Categories", icon: FolderOpen, href: "/admin/categories" },
-  { title: "Orders", icon: ShoppingCart, href: "/admin/orders" },
-  { title: "Customers", icon: Users, href: "/admin/customers" },
-  { title: "Settings", icon: Settings, href: "/admin/settings" },
+  { key: "nav.dashboard", icon: LayoutDashboard, href: "/admin" },
+  { key: "nav.products", icon: Package, href: "/admin/products" },
+  { key: "nav.categories", icon: FolderOpen, href: "/admin/categories" },
+  { key: "nav.orders", icon: ShoppingCart, href: "/admin/orders" },
+  { key: "nav.customers", icon: Users, href: "/admin/customers" },
+  { key: "nav.settings", icon: Settings, href: "/admin/settings" },
 ];
 
 interface AdminSidebarProps {
@@ -48,6 +49,7 @@ export function AdminSidebar({
   const isCollapsed = collapsed && !mobileOpen;
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { language, setLanguage, t, dir } = useAdminLanguage();
 
   const displayName =
     user?.user_metadata?.full_name ||
@@ -63,6 +65,7 @@ export function AdminSidebar({
 
   return (
     <aside
+      dir={dir}
       className={cn(
         "fixed left-0 top-0 z-50 h-screen border-r border-border bg-card transition-all duration-300 ease-out",
         "w-72 -translate-x-full lg:translate-x-0",
@@ -82,7 +85,7 @@ export function AdminSidebar({
                 <h1 className="font-heading text-lg font-semibold text-card-foreground">
                   Classimo
                 </h1>
-                <p className="text-xs text-muted-foreground">Admin Panel</p>
+                <p className="text-xs text-muted-foreground">{t("admin.panel")}</p>
               </div>
             )}
           </div>
@@ -91,7 +94,7 @@ export function AdminSidebar({
             size="icon"
             onClick={onMobileClose}
             className="lg:hidden"
-            aria-label="Close sidebar"
+            aria-label={t("admin.closeSidebar")}
           >
             <X className="h-5 w-5" />
           </Button>
@@ -116,7 +119,7 @@ export function AdminSidebar({
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-accent-foreground")} />
-                {!isCollapsed && <span className="animate-fade-in">{item.title}</span>}
+                {!isCollapsed && <span className="animate-fade-in">{t(item.key)}</span>}
               </NavLink>
             );
 
@@ -125,7 +128,7 @@ export function AdminSidebar({
                 <Tooltip key={item.href} delayDuration={0}>
                   <TooltipTrigger asChild>{navItem}</TooltipTrigger>
                   <TooltipContent side="right" className="font-medium">
-                    {item.title}
+                    {t(item.key)}
                   </TooltipContent>
                 </Tooltip>
               );
@@ -163,9 +166,27 @@ export function AdminSidebar({
 
           {!isCollapsed && (
             <div className="mt-3 flex gap-2 animate-fade-in">
+              <div className="flex overflow-hidden rounded-md border border-border">
+                <Button
+                  variant={language === "fr" ? "secondary" : "ghost"}
+                  size="sm"
+                  className="h-8 rounded-none px-3"
+                  onClick={() => setLanguage("fr")}
+                >
+                  FR
+                </Button>
+                <Button
+                  variant={language === "ar" ? "secondary" : "ghost"}
+                  size="sm"
+                  className="h-8 rounded-none px-3"
+                  onClick={() => setLanguage("ar")}
+                >
+                  AR
+                </Button>
+              </div>
               <Button variant="ghost" size="sm" className="flex-1 text-muted-foreground">
                 <Bell className="mr-2 h-4 w-4" />
-                Alerts
+                {t("admin.alerts")}
               </Button>
               <Button
                 variant="ghost"
@@ -177,7 +198,7 @@ export function AdminSidebar({
                 }}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Logout
+                {t("admin.logout")}
               </Button>
             </div>
           )}
@@ -194,7 +215,7 @@ export function AdminSidebar({
             )}
           >
             <ChevronLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
-            {!isCollapsed && <span>Collapse</span>}
+            {!isCollapsed && <span>{t("admin.collapse")}</span>}
           </Button>
         </div>
       </div>

@@ -27,12 +27,16 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WILAYAS } from "@/constants/wilayas";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 const DEFAULT_HERO_BRAND = "Classimo";
-const DEFAULT_HERO_TITLE = "Location & Vente de Costumes de Mariage";
-const DEFAULT_HERO_SUBTITLE = "Modeles premium • Tailles variees • Commande rapide et securisee";
+const DEFAULT_HERO_TITLE_FR = "Location & Vente de Costumes de Mariage";
+const DEFAULT_HERO_SUBTITLE_FR = "Modeles premium • Tailles variees • Commande rapide et securisee";
+const DEFAULT_HERO_TITLE_AR = "كراء و بيع كوستيم الأفراح";
+const DEFAULT_HERO_SUBTITLE_AR = "موديلات فاخرة • قياسات متعددة • طلب سريع وآمن";
 
 const Settings = () => {
+  const { t, dir } = useAdminLanguage();
   const { toast } = useToast();
   const storeSettings = useQuery(api.settings.get);
   const upsertStoreSettings = useMutation(api.settings.upsertStoreSettings);
@@ -43,8 +47,10 @@ const Settings = () => {
   const [announcementTextAr, setAnnouncementTextAr] = useState("");
   const [announcementTextFr, setAnnouncementTextFr] = useState("");
   const [heroBrandText, setHeroBrandText] = useState("");
-  const [heroTitleText, setHeroTitleText] = useState("");
-  const [heroSubtitleText, setHeroSubtitleText] = useState("");
+  const [heroTitleAr, setHeroTitleAr] = useState("");
+  const [heroTitleFr, setHeroTitleFr] = useState("");
+  const [heroSubtitleAr, setHeroSubtitleAr] = useState("");
+  const [heroSubtitleFr, setHeroSubtitleFr] = useState("");
 
   useEffect(() => {
     if (storeSettings) {
@@ -60,8 +66,10 @@ const Settings = () => {
       setAnnouncementTextAr(storeSettings.announcement_text_ar ?? "");
       setAnnouncementTextFr(storeSettings.announcement_text_fr ?? "");
       setHeroBrandText((storeSettings.hero_brand_text ?? "").trim() || DEFAULT_HERO_BRAND);
-      setHeroTitleText((storeSettings.hero_title_text ?? "").trim() || DEFAULT_HERO_TITLE);
-      setHeroSubtitleText((storeSettings.hero_subtitle_text ?? "").trim() || DEFAULT_HERO_SUBTITLE);
+      setHeroTitleAr((storeSettings.hero_title_ar ?? "").trim() || DEFAULT_HERO_TITLE_AR);
+      setHeroTitleFr((storeSettings.hero_title_fr ?? storeSettings.hero_title_text ?? "").trim() || DEFAULT_HERO_TITLE_FR);
+      setHeroSubtitleAr((storeSettings.hero_subtitle_ar ?? "").trim() || DEFAULT_HERO_SUBTITLE_AR);
+      setHeroSubtitleFr((storeSettings.hero_subtitle_fr ?? storeSettings.hero_subtitle_text ?? "").trim() || DEFAULT_HERO_SUBTITLE_FR);
     }
   }, [storeSettings]);
 
@@ -93,7 +101,7 @@ const Settings = () => {
       const parsed = Number(rawValue);
       if (!Number.isFinite(parsed) || parsed < 0) {
         toast({
-          title: "Invalid wilaya delivery price",
+        title: "Invalid wilaya delivery price",
           description: `Please enter a valid price for wilaya ${w.code}.`,
           variant: "destructive",
         });
@@ -121,8 +129,13 @@ const Settings = () => {
         announcement_text_ar: announcementTextAr.trim(),
         announcement_text_fr: announcementTextFr.trim(),
         hero_brand_text: heroBrandText.trim(),
-        hero_title_text: heroTitleText.trim(),
-        hero_subtitle_text: heroSubtitleText.trim(),
+        hero_title_ar: heroTitleAr.trim(),
+        hero_title_fr: heroTitleFr.trim(),
+        hero_subtitle_ar: heroSubtitleAr.trim(),
+        hero_subtitle_fr: heroSubtitleFr.trim(),
+        // keep legacy fields for backward compatibility
+        hero_title_text: heroTitleFr.trim(),
+        hero_subtitle_text: heroSubtitleFr.trim(),
       });
       toast({
         title: "Settings saved",
@@ -145,10 +158,10 @@ const Settings = () => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-heading font-semibold tracking-tight">
-            Settings
+            {t("settings.title")}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Manage your account and store preferences
+            {t("settings.subtitle")}
           </p>
         </div>
 
@@ -169,11 +182,11 @@ const Settings = () => {
           <TabsList className="bg-secondary/50 p-1">
             <TabsTrigger value="profile" className="gap-2">
               <User className="h-4 w-4" />
-              Profile
+              Profil
             </TabsTrigger>
             <TabsTrigger value="store" className="gap-2">
               <Store className="h-4 w-4" />
-              Store
+              Boutique
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2">
               <Bell className="h-4 w-4" />
@@ -181,7 +194,7 @@ const Settings = () => {
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2">
               <Shield className="h-4 w-4" />
-              Security
+              Securite
             </TabsTrigger>
           </TabsList>
 
@@ -372,7 +385,7 @@ const Settings = () => {
                         value={announcementTextAr}
                         onChange={(e) => setAnnouncementTextAr(e.target.value)}
                         className="input-luxury"
-                        dir="rtl"
+                        dir={dir}
                         placeholder="📦 التوصيل لجميع الولايات dz"
                       />
                     </div>
@@ -404,24 +417,46 @@ const Settings = () => {
                         placeholder="Classimo"
                       />
                     </div>
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor="hero_title_text">Hero Title</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="hero_title_fr">Hero Title (French)</Label>
                       <Input
-                        id="hero_title_text"
-                        value={heroTitleText}
-                        onChange={(e) => setHeroTitleText(e.target.value)}
+                        id="hero_title_fr"
+                        value={heroTitleFr}
+                        onChange={(e) => setHeroTitleFr(e.target.value)}
                         className="input-luxury"
                         placeholder="Location & Vente de Costumes de Mariage"
                       />
                     </div>
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor="hero_subtitle_text">Hero Subtitle</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="hero_title_ar">Hero Title (Arabic)</Label>
+                      <Input
+                        id="hero_title_ar"
+                        value={heroTitleAr}
+                        onChange={(e) => setHeroTitleAr(e.target.value)}
+                        className="input-luxury"
+                        dir="rtl"
+                        placeholder="كراء و بيع كوستيم الأفراح"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="hero_subtitle_fr">Hero Subtitle (French)</Label>
                       <Textarea
-                        id="hero_subtitle_text"
-                        value={heroSubtitleText}
-                        onChange={(e) => setHeroSubtitleText(e.target.value)}
+                        id="hero_subtitle_fr"
+                        value={heroSubtitleFr}
+                        onChange={(e) => setHeroSubtitleFr(e.target.value)}
                         className="input-luxury min-h-[90px]"
                         placeholder="Modeles premium • Tailles variees • Commande rapide et securisee"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="hero_subtitle_ar">Hero Subtitle (Arabic)</Label>
+                      <Textarea
+                        id="hero_subtitle_ar"
+                        value={heroSubtitleAr}
+                        onChange={(e) => setHeroSubtitleAr(e.target.value)}
+                        className="input-luxury min-h-[90px]"
+                        dir="rtl"
+                        placeholder="موديلات فاخرة • قياسات متعددة • طلب سريع وآمن"
                       />
                     </div>
                   </div>
@@ -467,7 +502,7 @@ const Settings = () => {
                     className="bg-accent text-accent-foreground hover:bg-accent/90"
                     onClick={saveStoreSettings}
                   >
-                    Save Changes
+                    Enregistrer
                   </Button>
                 </div>
               </CardContent>

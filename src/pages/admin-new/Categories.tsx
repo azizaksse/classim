@@ -15,6 +15,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, FolderOpen } from "lucide-react";
 import ImageUpload, { UploadedImage } from "@/components/ImageUpload";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 interface Category {
   _id: Id<"categories">;
@@ -26,6 +27,7 @@ interface Category {
 }
 
 const Categories = () => {
+  const { t, dir } = useAdminLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
@@ -86,19 +88,19 @@ const Categories = () => {
             image_url: imageUrl || undefined,
           },
         });
-        toast({ title: "Category updated successfully" });
+        toast({ title: t("categories.updated") });
       } else {
         await createCategory({
           name_ar: formData.name_ar.trim(),
           name_fr: formData.name_fr.trim(),
           image_url: imageUrl || undefined,
         });
-        toast({ title: "Category created successfully" });
+        toast({ title: t("categories.created") });
       }
       resetForm();
     } catch (error: any) {
       toast({
-        title: "Error saving category",
+        title: t("categories.saveError"),
         description: error.message,
         variant: "destructive",
       });
@@ -108,10 +110,10 @@ const Categories = () => {
   const handleDelete = async (id: Id<"categories">) => {
     try {
       await deleteCategory({ id });
-      toast({ title: "Category deleted successfully" });
+      toast({ title: t("categories.deleted") });
     } catch (error: any) {
       toast({
-        title: "Error deleting category",
+        title: t("categories.deleteError"),
         description: error.message,
         variant: "destructive",
       });
@@ -125,10 +127,10 @@ const Categories = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-heading font-semibold tracking-tight">
-              Categories
+              {t("categories.title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage product categories
+              {t("categories.subtitle")}
             </p>
           </div>
           <Button
@@ -136,30 +138,30 @@ const Categories = () => {
             className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-gold"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Category
+            {t("categories.addCategory")}
           </Button>
         </div>
 
         {/* Empty State */}
         {categoriesData === undefined ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-pulse text-muted-foreground">Loading...</div>
+            <div className="animate-pulse text-muted-foreground">{t("common.loading")}</div>
           </div>
         ) : categories.length === 0 ? (
           <div className="card-luxury p-12 text-center">
             <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="font-heading text-xl font-medium mb-2">
-              No categories yet
+              {t("categories.none")}
             </h3>
             <p className="text-muted-foreground mb-6">
-              Create your first category to organize products
+              {t("categories.noneSub")}
             </p>
             <Button
               onClick={openCreateDialog}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Category
+              {t("categories.addCategory")}
             </Button>
           </div>
         ) : (
@@ -193,9 +195,7 @@ const Categories = () => {
                     <p className="text-muted-foreground text-sm" dir="rtl">
                       {category.name_ar}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {productCount} products
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">{productCount} {t("categories.productsCount")}</p>
                     <div className="flex gap-2 mt-4">
                       <Button
                         variant="outline"
@@ -203,7 +203,7 @@ const Categories = () => {
                         onClick={() => openEditDialog(category)}
                       >
                         <Pencil className="h-4 w-4 mr-1" />
-                        Edit
+                        {t("common.edit")}
                       </Button>
                       <Button
                         variant="outline"
@@ -212,7 +212,7 @@ const Categories = () => {
                         onClick={() => handleDelete(category._id)}
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
+                        {t("common.delete")}
                       </Button>
                     </div>
                   </div>
@@ -227,12 +227,12 @@ const Categories = () => {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-heading text-xl">
-              {editingCategory ? "Edit Category" : "Add New Category"}
+              {editingCategory ? t("categories.editCategory") : t("categories.addNewCategory")}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
             <div>
-              <Label htmlFor="name_fr">Name (French)</Label>
+              <Label htmlFor="name_fr">{t("categories.nameFr")}</Label>
               <Input
                 id="name_fr"
                 value={formData.name_fr}
@@ -244,7 +244,7 @@ const Categories = () => {
               />
             </div>
             <div>
-              <Label htmlFor="name_ar">Name (Arabic)</Label>
+              <Label htmlFor="name_ar">{t("categories.nameAr")}</Label>
               <Input
                 id="name_ar"
                 value={formData.name_ar}
@@ -252,12 +252,12 @@ const Categories = () => {
                   setFormData({ ...formData, name_ar: e.target.value })
                 }
                 required
-                dir="rtl"
+                dir={dir}
                 className="input-luxury text-right"
               />
             </div>
             <div>
-              <Label>Category Image</Label>
+              <Label>{t("categories.image")}</Label>
               <ImageUpload
                 value={formData.image_url}
                 onChange={(urls) => setFormData({ ...formData, image_url: urls })}
@@ -267,13 +267,13 @@ const Categories = () => {
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={resetForm}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button
                 type="submit"
                 className="bg-accent text-accent-foreground hover:bg-accent/90"
               >
-                {editingCategory ? "Update" : "Create"} Category
+                {editingCategory ? t("common.update") : t("common.create")} {t("categories.title")}
               </Button>
             </div>
           </form>

@@ -3,6 +3,7 @@ import { AdminSidebar } from "./AdminSidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Crown, Menu } from "lucide-react";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -11,9 +12,10 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { language, setLanguage, t, dir } = useAdminLanguage();
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground" dir={dir}>
       <AdminSidebar
         mobileOpen={mobileSidebarOpen}
         onMobileClose={() => setMobileSidebarOpen(false)}
@@ -44,17 +46,37 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </div>
               <div>
                 <p className="text-sm font-semibold">Classimo</p>
-                <p className="text-[11px] text-muted-foreground">Admin Panel</p>
+                <p className="text-[11px] text-muted-foreground">{t("admin.panel")}</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setMobileSidebarOpen(true)}
-              aria-label="Open menu"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="flex overflow-hidden rounded-md border border-border">
+                <Button
+                  variant={language === "fr" ? "secondary" : "ghost"}
+                  size="sm"
+                  className="h-8 rounded-none px-2"
+                  onClick={() => setLanguage("fr")}
+                >
+                  FR
+                </Button>
+                <Button
+                  variant={language === "ar" ? "secondary" : "ghost"}
+                  size="sm"
+                  className="h-8 rounded-none px-2"
+                  onClick={() => setLanguage("ar")}
+                >
+                  AR
+                </Button>
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setMobileSidebarOpen(true)}
+                aria-label={t("admin.openMenu")}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </header>
 

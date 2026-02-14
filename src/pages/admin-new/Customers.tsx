@@ -30,6 +30,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 const statusStyles = {
   active: "bg-success/10 text-success border-success/20",
@@ -37,6 +38,7 @@ const statusStyles = {
 };
 
 const Customers = () => {
+  const { t } = useAdminLanguage();
   const [search, setSearch] = useState("");
 
   const { data: customers = [], isLoading } = useQuery({
@@ -53,8 +55,8 @@ const Customers = () => {
         const isNew = now - createdAt.getTime() < 1000 * 60 * 60 * 24 * 30;
         return {
           id: p.id,
-          name: p.full_name || "Anonymous",
-          email: p.email || "No email",
+          name: p.full_name || "-",
+          email: p.email || "-",
           phone: p.phone || "—",
           status: isNew ? "new" : "active",
           joinDate: createdAt.toLocaleDateString(),
@@ -73,7 +75,7 @@ const Customers = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-pulse text-muted-foreground">Loading...</div>
+          <div className="animate-pulse text-muted-foreground">{t("common.loading")}</div>
         </div>
       </AdminLayout>
     );
@@ -86,20 +88,20 @@ const Customers = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-heading font-semibold tracking-tight">
-              Customers
+              {t("customers.title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage and view customer information
+              {t("customers.subtitle")}
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t("customers.export")}
             </Button>
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
               <UserPlus className="h-4 w-4 mr-2" />
-              Add Customer
+              {t("customers.addCustomer")}
             </Button>
           </div>
         </div>
@@ -107,25 +109,25 @@ const Customers = () => {
         {/* Stats Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="card-luxury p-4">
-            <p className="text-sm text-muted-foreground">Total Customers</p>
+            <p className="text-sm text-muted-foreground">{t("customers.total")}</p>
             <p className="text-2xl font-heading font-semibold mt-1">
               {customers.length}
             </p>
           </div>
           <div className="card-luxury p-4">
-            <p className="text-sm text-muted-foreground">New This Month</p>
+            <p className="text-sm text-muted-foreground">{t("customers.newThisMonth")}</p>
             <p className="text-2xl font-heading font-semibold mt-1">
               {customers.filter((c) => c.status === "new").length}
             </p>
           </div>
           <div className="card-luxury p-4">
-            <p className="text-sm text-muted-foreground">With Email</p>
+            <p className="text-sm text-muted-foreground">{t("customers.withEmail")}</p>
             <p className="text-2xl font-heading font-semibold mt-1">
-              {customers.filter((c) => c.email && c.email !== "No email").length}
+              {customers.filter((c) => c.email && c.email !== "-").length}
             </p>
           </div>
           <div className="card-luxury p-4">
-            <p className="text-sm text-muted-foreground">With Phone</p>
+            <p className="text-sm text-muted-foreground">{t("customers.withPhone")}</p>
             <p className="text-2xl font-heading font-semibold mt-1">
               {customers.filter((c) => c.phone && c.phone !== "—").length}
             </p>
@@ -137,7 +139,7 @@ const Customers = () => {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search customers..."
+              placeholder={t("common.searchCustomers")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 input-luxury"
@@ -145,7 +147,7 @@ const Customers = () => {
           </div>
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" />
-            Filters
+            {t("customers.filters")}
           </Button>
         </div>
 
@@ -154,10 +156,10 @@ const Customers = () => {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead>Customer</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Join Date</TableHead>
+                <TableHead>{t("customers.customer")}</TableHead>
+                <TableHead>{t("customers.phone")}</TableHead>
+                <TableHead>{t("customers.status")}</TableHead>
+                <TableHead>{t("customers.joinDate")}</TableHead>
                 <TableHead className="w-[70px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -198,7 +200,7 @@ const Customers = () => {
                         statusStyles[customer.status as keyof typeof statusStyles]
                       )}
                     >
-                      {customer.status}
+                      {customer.status === "new" ? t("common.new") : t("common.active")}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
@@ -214,11 +216,11 @@ const Customers = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
                           <Eye className="h-4 w-4 mr-2" />
-                          View Profile
+                          {t("customers.viewProfile")}
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Mail className="h-4 w-4 mr-2" />
-                          Send Email
+                          {t("customers.sendEmail")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

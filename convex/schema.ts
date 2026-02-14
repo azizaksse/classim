@@ -13,6 +13,10 @@ export default defineSchema({
         hero_brand_text: v.optional(v.string()),
         hero_title_text: v.optional(v.string()),
         hero_subtitle_text: v.optional(v.string()),
+        hero_title_ar: v.optional(v.string()),
+        hero_title_fr: v.optional(v.string()),
+        hero_subtitle_ar: v.optional(v.string()),
+        hero_subtitle_fr: v.optional(v.string()),
         updated_at: v.optional(v.string()),
     }).index("by_key", ["key"]),
     categories: defineTable({

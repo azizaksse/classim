@@ -11,8 +11,16 @@ const Hero = () => {
   const { t, language } = useLanguage();
   const storeSettings = useQuery(api.settings.get);
   const heroBrand = (storeSettings?.hero_brand_text || "Classimo").trim();
-  const heroTitle = (storeSettings?.hero_title_text || t('hero.title')).trim();
-  const heroSubtitle = (storeSettings?.hero_subtitle_text || t('hero.subtitle')).trim();
+  const heroTitle = (
+    language === "ar"
+      ? (storeSettings?.hero_title_ar || storeSettings?.hero_title_text || t("hero.title"))
+      : (storeSettings?.hero_title_fr || storeSettings?.hero_title_text || t("hero.title"))
+  ).trim();
+  const heroSubtitle = (
+    language === "ar"
+      ? (storeSettings?.hero_subtitle_ar || storeSettings?.hero_subtitle_text || t("hero.subtitle"))
+      : (storeSettings?.hero_subtitle_fr || storeSettings?.hero_subtitle_text || t("hero.subtitle"))
+  ).trim();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">

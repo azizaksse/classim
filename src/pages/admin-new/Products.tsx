@@ -31,8 +31,10 @@ import {
 import { cn } from "@/lib/utils";
 import { useProducts } from "@/hooks/admin/useProducts";
 import { AddProductForm } from "@/components/admin-new/products/AddProductForm";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 const Products = () => {
+  const { t } = useAdminLanguage();
   const [view, setView] = useState<"grid" | "table">("table");
   const [search, setSearch] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
@@ -49,6 +51,11 @@ const Products = () => {
     if (stock === 0) return "out-of-stock";
     if (stock < 10) return "low-stock";
     return "in-stock";
+  };
+  const getStockLabel = (status: "in-stock" | "low-stock" | "out-of-stock") => {
+    if (status === "in-stock") return t("products.inStock");
+    if (status === "low-stock") return t("products.lowStock");
+    return t("products.outOfStock");
   };
 
   const statusStyles = {
@@ -68,7 +75,7 @@ const Products = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-pulse text-muted-foreground">Loading...</div>
+          <div className="animate-pulse text-muted-foreground">{t("common.loading")}</div>
         </div>
       </AdminLayout>
     );
@@ -81,17 +88,17 @@ const Products = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-heading font-semibold tracking-tight">
-              Products
+              {t("products.title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {products.length} products in inventory
+              {products.length} {t("products.inventoryCount")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" asChild>
               <Link to="/admin/categories">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Category
+                {t("products.addCategory")}
               </Link>
             </Button>
             <Button
@@ -99,7 +106,7 @@ const Products = () => {
               className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-gold"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Product
+              {t("products.addProduct")}
             </Button>
           </div>
         </div>
@@ -109,7 +116,7 @@ const Products = () => {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search products..."
+              placeholder={t("common.searchProducts")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 input-luxury"
@@ -140,17 +147,17 @@ const Products = () => {
           <div className="card-luxury p-12 text-center">
             <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="font-heading text-xl font-medium mb-2">
-              No products yet
+              {t("products.none")}
             </h3>
             <p className="text-muted-foreground mb-6">
-              Add your first product to get started
+              {t("products.noneSub")}
             </p>
             <Button
               onClick={() => setShowAddForm(true)}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Product
+              {t("products.addProduct")}
             </Button>
           </div>
         ) : view === "table" ? (
@@ -158,12 +165,12 @@ const Products = () => {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[300px]">Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Variants</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="w-[300px]">{t("products.product")}</TableHead>
+                  <TableHead>{t("products.category")}</TableHead>
+                  <TableHead>{t("products.price")}</TableHead>
+                  <TableHead>{t("products.variants")}</TableHead>
+                  <TableHead>{t("products.stock")}</TableHead>
+                  <TableHead>{t("products.status")}</TableHead>
                   <TableHead className="w-[70px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -219,7 +226,7 @@ const Products = () => {
                           variant="outline"
                           className={cn("capitalize", statusStyles[status])}
                         >
-                          {status.replace("-", " ")}
+                          {getStockLabel(status)}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -234,14 +241,14 @@ const Products = () => {
                               onClick={() => setEditingProduct(product)}
                             >
                               <Edit className="h-4 w-4 mr-2" />
-                              Edit
+                              {t("common.edit")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => deleteProduct(product.id)}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
+                              {t("common.delete")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -276,7 +283,7 @@ const Products = () => {
                         statusStyles[status]
                       )}
                     >
-                      {status.replace("-", " ")}
+                      {getStockLabel(status)}
                     </Badge>
                     <div className="absolute top-3 left-3 flex gap-2">
                       <Button
@@ -319,7 +326,7 @@ const Products = () => {
                         {formatPrice(product.price)}
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        {totalStock} in stock
+                        {totalStock} {t("products.stockLabel")}
                       </span>
                     </div>
                   </div>

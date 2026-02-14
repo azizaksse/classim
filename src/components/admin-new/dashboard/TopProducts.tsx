@@ -1,3 +1,5 @@
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
+
 interface TopProductsProps {
   products: any[];
   isLoading?: boolean;
@@ -9,6 +11,7 @@ const formatPrice = (value?: number | null) => {
 };
 
 export function TopProducts({ products, isLoading }: TopProductsProps) {
+  const { t } = useAdminLanguage();
   const sorted = [...(products || [])].sort((a, b) => {
     const aFeatured = a.is_featured ? 1 : 0;
     const bFeatured = b.is_featured ? 1 : 0;
@@ -20,16 +23,16 @@ export function TopProducts({ products, isLoading }: TopProductsProps) {
   return (
     <div className="card-luxury p-4 sm:p-5 lg:p-6">
       <div className="mb-4 sm:mb-6">
-        <h3 className="font-heading text-lg font-semibold">Latest Products</h3>
+        <h3 className="font-heading text-lg font-semibold">{t("dashboard.latestProducts")}</h3>
         <p className="text-sm text-muted-foreground">
-          Recently added or featured products
+          {t("dashboard.latestProductsSub")}
         </p>
       </div>
       {isLoading ? (
-        <div className="py-6 text-sm text-muted-foreground">Loading...</div>
+        <div className="py-6 text-sm text-muted-foreground">{t("common.loading")}</div>
       ) : top.length === 0 ? (
         <div className="py-6 text-sm text-muted-foreground">
-          No products yet
+          {t("dashboard.noProducts")}
         </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
@@ -53,14 +56,14 @@ export function TopProducts({ products, isLoading }: TopProductsProps) {
                   {product.name_fr || product.name_ar || "Untitled"}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {product.category_name || "Uncategorized"}
+                  {product.category_name || t("dashboard.uncategorized")}
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-sm">
                   {formatPrice(product.sale_price ?? product.rent_price)}
                 </p>
-                <p className="text-xs text-muted-foreground">Price</p>
+                <p className="text-xs text-muted-foreground">{t("dashboard.price")}</p>
               </div>
             </div>
           ))}

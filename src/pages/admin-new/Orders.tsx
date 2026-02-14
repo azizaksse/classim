@@ -49,8 +49,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 const Orders = () => {
+  const { t } = useAdminLanguage();
   const [timeRange, setTimeRange] = useState<"today" | "week" | "month" | "all">("today");
 
   // Calculate Date Ranges
@@ -97,9 +99,9 @@ const Orders = () => {
     setUpdatingId(orderId);
     try {
       await updateStatus({ orderId, status: newStatus as any });
-      toast.success("Order status updated");
+      toast.success(t("orders.statusUpdated"));
     } catch (error) {
-      toast.error("Failed to update status");
+      toast.error(t("orders.statusUpdateFailed"));
       console.error(error);
     } finally {
       setUpdatingId(null);
@@ -110,9 +112,9 @@ const Orders = () => {
     setIsResyncing(orderId);
     try {
       await resyncOrder({ orderId });
-      toast.success("Order queued for sync to Octomatic");
+      toast.success(t("orders.resyncQueued"));
     } catch (error) {
-      toast.error("Failed to resync order");
+      toast.error(t("orders.resyncFailed"));
       console.error(error);
     } finally {
       setIsResyncing(null);
@@ -122,9 +124,9 @@ const Orders = () => {
   const handleDelete = async (orderId: Id<"orders">) => {
     try {
       await deleteOrder({ orderId });
-      toast.success("Order deleted successfully");
+      toast.success(t("orders.deleted"));
     } catch (error) {
-      toast.error("Failed to delete order");
+      toast.error(t("orders.deleteFailed"));
       console.error(error);
     }
   };
@@ -164,10 +166,10 @@ const Orders = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-heading font-semibold tracking-tight">
-              Orders Dashboard
+              {t("orders.title")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Overview of all customer orders and revenue
+              {t("orders.subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -185,7 +187,7 @@ const Orders = () => {
                 {({ loading }) => (
                   <Button variant="outline" className="gap-2" disabled={loading}>
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                    Export PDF
+                    {t("orders.exportPdf")}
                   </Button>
                 )}
               </PDFDownloadLink>
@@ -201,10 +203,10 @@ const Orders = () => {
           className="w-full"
         >
           <TabsList>
-            <TabsTrigger value="today">Today</TabsTrigger>
-            <TabsTrigger value="week">This Week</TabsTrigger>
-            <TabsTrigger value="month">This Month</TabsTrigger>
-            <TabsTrigger value="all">All Time</TabsTrigger>
+            <TabsTrigger value="today">{t("orders.today")}</TabsTrigger>
+            <TabsTrigger value="week">{t("orders.week")}</TabsTrigger>
+            <TabsTrigger value="month">{t("orders.month")}</TabsTrigger>
+            <TabsTrigger value="all">{t("orders.allTime")}</TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -212,7 +214,7 @@ const Orders = () => {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("orders.totalOrders")}</CardTitle>
               <ShoppingCart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -222,7 +224,7 @@ const Orders = () => {
                 <>
                   <div className="text-2xl font-bold">{stats?.totalOrders}</div>
                   <p className="text-xs text-muted-foreground">
-                    {stats?.verifiedOrders} confirmed, {stats?.cancelledOrders} cancelled
+                    {stats?.verifiedOrders} {t("orders.confirmed")}, {stats?.cancelledOrders} {t("orders.cancelled")}
                   </p>
                 </>
               )}
@@ -230,7 +232,7 @@ const Orders = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Est. Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("orders.revenue")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -242,7 +244,7 @@ const Orders = () => {
                     {formatCurrency(stats?.totalRevenue || 0)}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Based on current product prices (excluding cancelled)
+                    {t("orders.revenueSub")}
                   </p>
                 </>
               )}
@@ -250,7 +252,7 @@ const Orders = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("orders.avgOrderValue")}</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -262,7 +264,7 @@ const Orders = () => {
                     {formatCurrency(stats?.averageOrderValue || 0)}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Per order average
+                    {t("orders.avgSub")}
                   </p>
                 </>
               )}
@@ -273,7 +275,7 @@ const Orders = () => {
         {/* Orders Table */}
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
+            <CardTitle>{t("orders.recentOrders")}</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -284,13 +286,13 @@ const Orders = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-start">Customer</TableHead>
-                    <TableHead className="text-start">Product</TableHead>
-                    <TableHead className="text-start">Location</TableHead>
-                    <TableHead className="text-start">Date</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead className="text-center">Items</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
+                    <TableHead className="text-start">{t("orders.customer")}</TableHead>
+                    <TableHead className="text-start">{t("orders.product")}</TableHead>
+                    <TableHead className="text-start">{t("orders.location")}</TableHead>
+                    <TableHead className="text-start">{t("orders.date")}</TableHead>
+                    <TableHead className="text-center">{t("orders.status")}</TableHead>
+                    <TableHead className="text-center">{t("orders.items")}</TableHead>
+                    <TableHead className="text-center">{t("orders.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -326,15 +328,15 @@ const Orders = () => {
                             disabled={updatingId === order._id}
                           >
                             <SelectTrigger className={`w-[130px] h-8 ${getStatusColor(order.status || 'pending')}`}>
-                              <SelectValue placeholder="Status" />
+                              <SelectValue placeholder={t("orders.status")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="confirmed">Confirmed</SelectItem>
-                              <SelectItem value="approved">Approved</SelectItem>
-                              <SelectItem value="processing">Processing</SelectItem>
-                              <SelectItem value="delivered">Delivered</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
+                              <SelectItem value="pending">{t("orders.pending")}</SelectItem>
+                              <SelectItem value="confirmed">{t("orders.confirmed")}</SelectItem>
+                              <SelectItem value="approved">{t("orders.approved")}</SelectItem>
+                              <SelectItem value="processing">{t("orders.processing")}</SelectItem>
+                              <SelectItem value="delivered">{t("orders.delivered")}</SelectItem>
+                              <SelectItem value="cancelled">{t("orders.cancelled")}</SelectItem>
                             </SelectContent>
                           </Select>
                           {updatingId === order._id && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
@@ -352,7 +354,7 @@ const Orders = () => {
                               className="h-8 w-8 text-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
                               onClick={() => handleResync(order._id)}
                               disabled={isResyncing === order._id}
-                              title="Resync to Octomatic"
+                              title={t("orders.resyncTitle")}
                             >
                               {isResyncing === order._id ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                             </Button>
@@ -365,15 +367,15 @@ const Orders = () => {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Order?</AlertDialogTitle>
+                                <AlertDialogTitle>{t("orders.deleteTitle")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete this order from {order.customer_name}? This action cannot be undone.
+                                  {t("orders.deleteDescription")}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => handleDelete(order._id)} className="bg-destructive hover:bg-destructive/90">
-                                  Delete
+                                  {t("common.delete")}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -387,9 +389,9 @@ const Orders = () => {
             ) : (
               <div className="flex flex-col items-center justify-center p-8 text-center">
                 <AlertCircle className="h-10 w-10 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No orders found</h3>
+                <h3 className="text-lg font-medium">{t("orders.noOrders")}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Try changing the date filter or check back later.
+                  {t("orders.noOrdersSub")}
                 </p>
               </div>
             )}

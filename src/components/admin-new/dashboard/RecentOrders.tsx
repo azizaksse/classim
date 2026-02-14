@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
 
 interface RecentCustomer {
   id: string;
@@ -19,29 +20,30 @@ const formatDate = (value: string) => {
 };
 
 export function RecentCustomers({ customers, isLoading }: RecentCustomersProps) {
+  const { t } = useAdminLanguage();
   return (
     <div className="card-luxury p-4 sm:p-5 lg:p-6">
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div>
           <h3 className="font-heading text-lg font-semibold">
-            Recent Customers
+            {t("dashboard.recentCustomers")}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Latest signups from your store
+            {t("dashboard.recentCustomersSub")}
           </p>
         </div>
         <a
           href="/admin/customers"
           className="text-sm text-accent hover:text-accent/80 transition-colors"
         >
-          View all →
+          {t("common.viewAll")} →
         </a>
       </div>
       {isLoading ? (
-        <div className="py-6 text-sm text-muted-foreground">Loading...</div>
+        <div className="py-6 text-sm text-muted-foreground">{t("common.loading")}</div>
       ) : customers.length === 0 ? (
         <div className="py-6 text-sm text-muted-foreground">
-          No customers yet
+          {t("dashboard.noCustomers")}
         </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
@@ -69,7 +71,7 @@ export function RecentCustomers({ customers, isLoading }: RecentCustomersProps) 
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-sm">Joined</p>
+                <p className="font-semibold text-sm">{t("common.joined")}</p>
                 <p className="text-xs text-muted-foreground">
                   {formatDate(customer.created_at)}
                 </p>

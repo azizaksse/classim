@@ -21,6 +21,10 @@ export const get = query({
             hero_brand_text: settings?.hero_brand_text ?? "",
             hero_title_text: settings?.hero_title_text ?? "",
             hero_subtitle_text: settings?.hero_subtitle_text ?? "",
+            hero_title_ar: settings?.hero_title_ar ?? "",
+            hero_title_fr: settings?.hero_title_fr ?? "",
+            hero_subtitle_ar: settings?.hero_subtitle_ar ?? "",
+            hero_subtitle_fr: settings?.hero_subtitle_fr ?? "",
             updated_at: settings?.updated_at ?? null,
         };
     },
@@ -64,6 +68,10 @@ export const upsertStoreSettings = mutation({
         hero_brand_text: v.optional(v.string()),
         hero_title_text: v.optional(v.string()),
         hero_subtitle_text: v.optional(v.string()),
+        hero_title_ar: v.optional(v.string()),
+        hero_title_fr: v.optional(v.string()),
+        hero_subtitle_ar: v.optional(v.string()),
+        hero_subtitle_fr: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const existing = await ctx.db
@@ -81,6 +89,10 @@ export const upsertStoreSettings = mutation({
             hero_brand_text?: string;
             hero_title_text?: string;
             hero_subtitle_text?: string;
+            hero_title_ar?: string;
+            hero_title_fr?: string;
+            hero_subtitle_ar?: string;
+            hero_subtitle_fr?: string;
             updated_at: string;
         } = {
             updated_at: new Date().toISOString(),
@@ -114,6 +126,18 @@ export const upsertStoreSettings = mutation({
         if (args.hero_subtitle_text !== undefined) {
             updates.hero_subtitle_text = args.hero_subtitle_text;
         }
+        if (args.hero_title_ar !== undefined) {
+            updates.hero_title_ar = args.hero_title_ar;
+        }
+        if (args.hero_title_fr !== undefined) {
+            updates.hero_title_fr = args.hero_title_fr;
+        }
+        if (args.hero_subtitle_ar !== undefined) {
+            updates.hero_subtitle_ar = args.hero_subtitle_ar;
+        }
+        if (args.hero_subtitle_fr !== undefined) {
+            updates.hero_subtitle_fr = args.hero_subtitle_fr;
+        }
 
         if (existing) {
             await ctx.db.patch(existing._id, updates);
@@ -131,6 +155,10 @@ export const upsertStoreSettings = mutation({
             hero_brand_text: args.hero_brand_text ?? "",
             hero_title_text: args.hero_title_text ?? "",
             hero_subtitle_text: args.hero_subtitle_text ?? "",
+            hero_title_ar: args.hero_title_ar ?? "",
+            hero_title_fr: args.hero_title_fr ?? "",
+            hero_subtitle_ar: args.hero_subtitle_ar ?? "",
+            hero_subtitle_fr: args.hero_subtitle_fr ?? "",
             updated_at: new Date().toISOString(),
         });
     },

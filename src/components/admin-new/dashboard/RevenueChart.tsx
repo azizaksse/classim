@@ -1,3 +1,5 @@
+import { useAdminLanguage } from "@/contexts/AdminLanguageContext";
+
 interface CategoryBreakdownProps {
   categories: any[];
   products: any[];
@@ -5,13 +7,14 @@ interface CategoryBreakdownProps {
 }
 
 export function RevenueChart({ categories, products, isLoading }: CategoryBreakdownProps) {
+  const { t } = useAdminLanguage();
   const counts = (categories || []).map((category) => {
     const count = (products || []).filter(
       (p: any) => p.category_id === category._id
     ).length;
     return {
       id: category._id,
-      name: category.name_fr || category.name_ar || "Uncategorized",
+      name: category.name_fr || category.name_ar || t("dashboard.uncategorized"),
       count,
     };
   });
@@ -23,7 +26,7 @@ export function RevenueChart({ categories, products, isLoading }: CategoryBreakd
   if (uncategorizedCount > 0) {
     counts.push({
       id: "uncategorized",
-      name: "Uncategorized",
+      name: t("dashboard.uncategorized"),
       count: uncategorizedCount,
     });
   }
@@ -34,17 +37,17 @@ export function RevenueChart({ categories, products, isLoading }: CategoryBreakd
     <div className="card-luxury p-4 sm:p-5 lg:p-6">
       <div className="mb-4 sm:mb-6">
         <h3 className="font-heading text-lg font-semibold">
-          Products by Category
+          {t("dashboard.productsByCategory")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          Live count based on your current catalog
+          {t("dashboard.productsByCategorySub")}
         </p>
       </div>
       {isLoading ? (
-        <div className="py-6 text-sm text-muted-foreground">Loading...</div>
+        <div className="py-6 text-sm text-muted-foreground">{t("common.loading")}</div>
       ) : counts.length === 0 ? (
         <div className="py-6 text-sm text-muted-foreground">
-          No categories yet
+          {t("dashboard.noCategories")}
         </div>
       ) : (
         <div className="space-y-3">
