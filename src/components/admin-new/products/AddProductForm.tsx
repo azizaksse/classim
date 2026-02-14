@@ -287,7 +287,20 @@ export const AddProductForm = ({
               ))}
             </div>
             {sizes.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">Selected sizes (click to remove)</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setSizes([])}
+                  >
+                    Clear all
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => (
                   <Button
                     key={`selected-size-${size}`}
@@ -300,6 +313,7 @@ export const AddProductForm = ({
                     {size} ×
                   </Button>
                 ))}
+                </div>
               </div>
             )}
             <div className="flex gap-2">
@@ -346,7 +360,20 @@ export const AddProductForm = ({
               ))}
             </div>
             {colors.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">Selected colors (click to remove)</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs"
+                    onClick={() => setColors([])}
+                  >
+                    Clear all
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
                 {colors.map((color) => (
                   <Button
                     key={`selected-color-${color}`}
@@ -359,6 +386,7 @@ export const AddProductForm = ({
                     {color} ×
                   </Button>
                 ))}
+                </div>
               </div>
             )}
             <div className="flex gap-2">
