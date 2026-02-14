@@ -181,6 +181,21 @@ const ProductDetail = () => {
                       <span className="text-sm text-muted-foreground ms-2">
                         {language === 'ar' ? 'السعر' : 'Prix'}
                       </span>
+                      {product.salePercentage && product.salePercentage > 0 && product.originalPrice && product.originalPrice > product.rentPrice && (
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-sm line-through text-muted-foreground">
+                            {product.originalPrice.toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
+                          </span>
+                          <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
+                            -{product.salePercentage}%
+                          </span>
+                        </div>
+                      )}
+                      <div className="mt-2 text-sm font-medium">
+                        {product.inStock
+                          ? (language === 'ar' ? `متوفر في المخزون (${product.stock})` : `In stock (${product.stock})`)
+                          : (language === 'ar' ? 'غير متوفر في المخزون' : 'Out of stock')}
+                      </div>
                     </div>
                   </div>
 

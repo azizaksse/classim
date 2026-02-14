@@ -10,14 +10,30 @@ interface ProductCardProps {
   nameFr: string;
   images: string[];
   rentPrice: number;
+  originalPrice?: number;
+  salePercentage?: number;
+  stock?: number;
+  inStock?: boolean;
   sizes: string[];
   categoryId?: string;
 }
 
-const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, sizes }: ProductCardProps) => {
+const ProductCard = ({
+  id,
+  nameAr,
+  nameFr,
+  images,
+  rentPrice,
+  originalPrice,
+  salePercentage,
+  stock = 0,
+  inStock = false,
+  sizes,
+}: ProductCardProps) => {
   const { language, t } = useLanguage();
 
   const productName = language === 'ar' ? nameAr : nameFr;
+  const hasDiscount = Boolean(salePercentage && salePercentage > 0 && originalPrice && originalPrice > rentPrice);
 
   return (
     <motion.div
@@ -71,6 +87,22 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, sizes }: ProductCa
               {language === 'ar' ? 'السعر' : 'Prix'}
             </span>
           </div>
+          {hasDiscount && (
+            <>
+              <span className="text-xs line-through text-muted-foreground">
+                {Number(originalPrice).toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
+              </span>
+              <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
+                -{salePercentage}%
+              </span>
+            </>
+          )}
+        </div>
+
+        <div className="mb-3 text-xs font-medium">
+          {inStock
+            ? (language === 'ar' ? `متوفر (${stock})` : `In stock (${stock})`)
+            : (language === 'ar' ? 'غير متوفر' : 'Out of stock')}
         </div>
 
         {/* Sizes */}

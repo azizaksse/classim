@@ -39,8 +39,12 @@ export const AddProductForm = ({
   const [nameFr, setNameFr] = useState(product?.name_fr || "");
   const [descriptionAr, setDescriptionAr] = useState(product?.description_ar || "");
   const [descriptionFr, setDescriptionFr] = useState(product?.description_fr || "");
-  const [salePrice, setSalePrice] = useState(
-    product?.sale_price?.toString() || product?.rent_price?.toString() || ""
+  const [basePrice, setBasePrice] = useState(product?.rent_price?.toString() || "");
+  const [salePercentage, setSalePercentage] = useState(
+    product?.sale_percentage !== undefined ? String(product.sale_percentage) : "0"
+  );
+  const [stock, setStock] = useState(
+    product?.stock !== undefined ? String(product.stock) : "0"
   );
   const [categoryId, setCategoryId] = useState(product?.category_id || "");
   const [images, setImages] = useState<UploadedImage[]>(
@@ -48,10 +52,40 @@ export const AddProductForm = ({
   );
   const [sizes, setSizes] = useState<string[]>(product?.sizes || ["M"]);
   const [colors, setColors] = useState<string[]>(product?.colors || ["Black"]);
+  const [customSize, setCustomSize] = useState("");
+  const [customColor, setCustomColor] = useState("");
   const [isFeatured, setIsFeatured] = useState(product?.is_featured || false);
-  const [isActive, setIsActive] = useState(product?.is_active || true);
+  const [isActive, setIsActive] = useState(product?.is_active ?? true);
 
   const categories = useQuery(api.categories.get);
+
+  const normalizeList = (values: string[]) =>
+    Array.from(
+      new Set(
+        values
+          .map((value) => value.normalize("NFKC"))
+          .map((value) => value.trim())
+          .filter(Boolean)
+      )
+    );
+
+  const addCustomSize = () => {
+    const value = customSize.trim();
+    if (!value) return;
+    if (!sizes.includes(value)) {
+      setSizes([...sizes, value]);
+    }
+    setCustomSize("");
+  };
+
+  const addCustomColor = () => {
+    const value = customColor.trim();
+    if (!value) return;
+    if (!colors.includes(value)) {
+      setColors([...colors, value]);
+    }
+    setCustomColor("");
+  };
 
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -61,25 +95,41 @@ export const AddProductForm = ({
       toast.error("Please enter product names in both languages");
       return;
     }
-    if (!salePrice || parseFloat(salePrice) <= 0) {
+    if (!basePrice || parseFloat(basePrice) <= 0) {
       toast.error("Please enter a valid price");
       return;
     }
+
+    const parsedSalePercentage = Number(salePercentage);
+    if (!Number.isFinite(parsedSalePercentage) || parsedSalePercentage < 0 || parsedSalePercentage > 100) {
+      toast.error("Sale percentage must be between 0 and 100");
+      return;
+    }
+
+    const parsedStock = Number(stock);
+    if (!Number.isFinite(parsedStock) || parsedStock < 0) {
+      toast.error("Please enter a valid stock");
+      return;
+    }
+
+    const nextSizes = normalizeList([...sizes, customSize]);
+    const nextColors = normalizeList([...colors, customColor]);
 
     onSubmit({
       name_ar: nameAr.trim(),
       name_fr: nameFr.trim(),
       description_ar: descriptionAr.trim(),
       description_fr: descriptionFr.trim(),
-      rent_price: parseFloat(salePrice),
-      sale_price: parseFloat(salePrice),
+      rent_price: parseFloat(basePrice),
+      sale_percentage: parsedSalePercentage,
+      stock: Math.floor(parsedStock),
       category_id: categoryId || undefined,
       images:
         images.length > 0
           ? images.map((img) => img.id || img.url)
           : ["/placeholder.svg"],
-      sizes,
-      colors,
+      sizes: nextSizes.length ? nextSizes : ["M"],
+      colors: nextColors.length ? nextColors : ["Black"],
       is_featured: isFeatured,
       is_active: isActive,
     });
@@ -89,11 +139,15 @@ export const AddProductForm = ({
     setNameFr("");
     setDescriptionAr("");
     setDescriptionFr("");
-    setSalePrice("");
+    setBasePrice("");
+    setSalePercentage("0");
+    setStock("0");
     setCategoryId("");
     setImages([]);
     setSizes(["M"]);
     setColors(["Black"]);
+    setCustomSize("");
+    setCustomColor("");
     onOpenChange(false);
   };
 
@@ -158,12 +212,37 @@ export const AddProductForm = ({
           {/* Prices & Category */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="sale_price">Price (DA) *</Label>
+              <Label htmlFor="rent_price">Base Price (DA) *</Label>
               <Input
-                id="sale_price"
+                id="rent_price"
                 type="number"
-                value={salePrice}
-                onChange={(e) => setSalePrice(e.target.value)}
+                value={basePrice}
+                onChange={(e) => setBasePrice(e.target.value)}
+                className="input-luxury"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sale_percentage">Sale (%)</Label>
+              <Input
+                id="sale_percentage"
+                type="number"
+                min={0}
+                max={100}
+                step="1"
+                value={salePercentage}
+                onChange={(e) => setSalePercentage(e.target.value)}
+                className="input-luxury"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stock">Stock</Label>
+              <Input
+                id="stock"
+                type="number"
+                min={0}
+                step="1"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
                 className="input-luxury"
               />
             </div>
@@ -186,7 +265,7 @@ export const AddProductForm = ({
 
           {/* Sizes */}
           <div className="space-y-2">
-            <Label>Available Sizes</Label>
+            <Label>Available Sizes / المقاسات المتوفرة</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {["46", "48", "50", "52", "54", "56", "S", "M", "L", "XL", "XXL"].map((size) => (
                 <Button
@@ -207,27 +286,45 @@ export const AddProductForm = ({
                 </Button>
               ))}
             </div>
+            {sizes.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((size) => (
+                  <Button
+                    key={`selected-size-${size}`}
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 px-3"
+                    onClick={() => setSizes(sizes.filter((s) => s !== size))}
+                  >
+                    {size} ×
+                  </Button>
+                ))}
+              </div>
+            )}
             <div className="flex gap-2">
               <Input
-                placeholder="Add custom size..."
+                placeholder="Add custom size... / أضف مقاس"
                 className="input-luxury h-8"
+                value={customSize}
+                onChange={(e) => setCustomSize(e.target.value)}
+                dir="auto"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    const val = e.currentTarget.value.trim();
-                    if (val && !sizes.includes(val)) {
-                      setSizes([...sizes, val]);
-                      e.currentTarget.value = "";
-                    }
+                    addCustomSize();
                   }
                 }}
               />
+              <Button type="button" size="sm" variant="outline" onClick={addCustomSize}>
+                Add / إضافة
+              </Button>
             </div>
           </div>
 
           {/* Colors */}
           <div className="space-y-2">
-            <Label>Available Colors</Label>
+            <Label>Available Colors / الألوان المتوفرة</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {["Black", "White", "Navy", "Gray", "Beige", "Brown", "Green", "Burgundy"].map((color) => (
                 <Button
@@ -248,21 +345,39 @@ export const AddProductForm = ({
                 </Button>
               ))}
             </div>
+            {colors.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => (
+                  <Button
+                    key={`selected-color-${color}`}
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 px-3"
+                    onClick={() => setColors(colors.filter((c) => c !== color))}
+                  >
+                    {color} ×
+                  </Button>
+                ))}
+              </div>
+            )}
             <div className="flex gap-2">
               <Input
-                placeholder="Add custom color..."
+                placeholder="Add custom color... / أضف لون"
                 className="input-luxury h-8"
+                value={customColor}
+                onChange={(e) => setCustomColor(e.target.value)}
+                dir="auto"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    const val = e.currentTarget.value.trim();
-                    if (val && !colors.includes(val)) {
-                      setColors([...colors, val]);
-                      e.currentTarget.value = "";
-                    }
+                    addCustomColor();
                   }
                 }}
               />
+              <Button type="button" size="sm" variant="outline" onClick={addCustomColor}>
+                Add / إضافة
+              </Button>
             </div>
           </div>
 

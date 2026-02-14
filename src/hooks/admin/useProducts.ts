@@ -18,6 +18,8 @@ export interface Product {
   price: number;
   rent_price: number;
   sale_price: number | null;
+  sale_percentage?: number;
+  stock?: number;
   category: string;
   category_id: Id<"categories"> | null;
   image: string;
@@ -45,6 +47,8 @@ export const useProducts = () => {
     id: p._id,
     name: p.name_fr,
     price: p.sale_price ?? p.rent_price,
+    sale_percentage: p.sale_percentage,
+    stock: p.stock ?? 0,
     image: p.images?.[0] || "",
     category: p.category_name || "Uncategorized",
     variants:
@@ -95,6 +99,7 @@ export const useProducts = () => {
   };
 
   const getTotalStock = (product: Product) => {
+    if (typeof product.stock === "number") return product.stock;
     return product.variants.reduce((sum, v) => sum + v.stock, 0);
   };
 

@@ -24,6 +24,8 @@ export default defineSchema({
         description_fr: v.optional(v.string()),
         rent_price: v.float64(),
         sale_price: v.optional(v.float64()),
+        sale_percentage: v.optional(v.float64()),
+        stock: v.optional(v.float64()),
         images: v.optional(v.array(v.string())),
         sizes: v.optional(v.array(v.string())),
         colors: v.optional(v.array(v.string())),
