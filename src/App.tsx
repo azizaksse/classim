@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,9 +10,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AnimatePresence } from "framer-motion";
 import ScrollToTop from "@/components/ScrollToTop";
-import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { ThemeProvider } from "next-themes";
-import TrackingSection from "@/components/TrackingSection";
+const TrackingSection = lazy(() => import("./components/TrackingSection"));
 
 // Lazy load all pages for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -19,11 +19,14 @@ const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
+const AdminAccess = lazy(() => import("./pages/AdminAccess"));
 const AdminDashboard = lazy(() => import("./pages/admin-new/Dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin-new/Products"));
+const AdminCategories = lazy(() => import("./pages/admin-new/Categories"));
 const AdminOrders = lazy(() => import("./pages/admin-new/Orders"));
 const AdminCustomers = lazy(() => import("./pages/admin-new/Customers"));
 const AdminSettings = lazy(() => import("./pages/admin-new/Settings"));
+const ThankYou = lazy(() => import("./pages/ThankYou"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -36,6 +39,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
 
 // Loading fallback for lazy loaded components
 const PageLoader = () => (
@@ -58,9 +63,12 @@ const AnimatedRoutes = () => {
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/admin-access" element={<AdminAccess />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/categories" element={<AdminCategories />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/customers" element={<AdminCustomers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
@@ -71,27 +79,77 @@ const AnimatedRoutes = () => {
   );
 };
 
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-        <AuthProvider>
-          <LanguageProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <TrackingSection />
-                <FloatingWhatsApp />
-                <AnimatedRoutes />
-              </BrowserRouter>
-            </TooltipProvider>
-          </LanguageProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  </HelmetProvider>
-);
+const useDeferredMount = (delayMs = 800) => {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: number | null = null;
+    let idleId: number | null = null;
+
+    const onReady = () => setReady(true);
+
+    if ("requestIdleCallback" in window) {
+      idleId = (window as Window & { requestIdleCallback: (cb: () => void) => number }).requestIdleCallback(onReady);
+    } else {
+      timeoutId = window.setTimeout(onReady, delayMs);
+    }
+
+    return () => {
+      if (idleId !== null && "cancelIdleCallback" in window) {
+        (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [delayMs]);
+
+  return ready;
+};
+
+const Overlays = () => {
+  const location = useLocation();
+  const showOverlays = useDeferredMount();
+
+  if (location.pathname.startsWith("/admin")) {
+    return null;
+  }
+
+  if (!showOverlays) {
+    return null;
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <TrackingSection />
+    </Suspense>
+  );
+};
+
+const App = () => {
+  return (
+    <HelmetProvider>
+      <ConvexProvider client={convex}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <AuthProvider>
+              <LanguageProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <ScrollToTop />
+                    <Overlays />
+                    <AnimatedRoutes />
+                  </BrowserRouter>
+                </TooltipProvider>
+              </LanguageProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </ConvexProvider>
+    </HelmetProvider>
+  );
+};
 
 export default App;

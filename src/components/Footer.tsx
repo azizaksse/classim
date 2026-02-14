@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { MessageCircle, Phone, Mail, Settings } from 'lucide-react';
 import logo from '@/assets/logo.jpg';
 
 const Footer = () => {
   const { t, language } = useLanguage();
-  const { isAdmin } = useAuth();
 
   const whatsappNumber = '213795443714';
   const email = 'ganiislam452@gmail.com';
@@ -68,7 +66,15 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center gap-3 group mb-6">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-primary bg-white p-1 shadow-gold transition-all duration-300 group-hover:scale-110">
-                <img src={logo} alt="Classimo Logo" className="w-full h-full object-cover rounded-full" />
+                <img
+                  src={logo}
+                  alt="Classimo Logo"
+                  className="w-full h-full object-cover rounded-full"
+                  loading="lazy"
+                  decoding="async"
+                  width={80}
+                  height={80}
+                />
               </div>
               <span className={`text-2xl md:text-3xl font-bold text-gradient-gold ${language === 'ar' ? 'font-arabic' : 'font-display'}`}>
                 {language === 'ar' ? 'كلاسيمو' : 'Classimo'}
@@ -115,14 +121,15 @@ const Footer = () => {
                   {t('nav.contact')}
                 </Link>
               </li>
-              {isAdmin && (
-                <li>
-                  <Link to="/admin" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
-                    <Settings className="w-3.5 h-3.5" />
-                    Administration
-                  </Link>
-                </li>
-              )}
+              <li>
+                <Link
+                  to="/admin-access"
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  Administration
+                </Link>
+              </li>
             </ul>
           </div>
 
