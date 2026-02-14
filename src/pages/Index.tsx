@@ -1,16 +1,18 @@
+import { lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PageTransition from '@/components/PageTransition';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
-import TrustBadges from '@/components/TrustBadges';
-import SizeCalculator from '@/components/SizeCalculator';
-import Categories from '@/components/Categories';
-import FeaturedProducts from '@/components/FeaturedProducts';
-import Testimonials from '@/components/Testimonials';
-import InstagramFeed from '@/components/InstagramFeed';
-import CTASection from '@/components/CTASection';
+import DeferredSection from '@/components/DeferredSection';
 import Footer from '@/components/Footer';
+const TrustBadges = lazy(() => import('@/components/TrustBadges'));
+const FeaturedProducts = lazy(() => import('@/components/FeaturedProducts'));
+const Categories = lazy(() => import('@/components/Categories'));
+const SizeCalculator = lazy(() => import('@/components/SizeCalculator'));
+const Testimonials = lazy(() => import('@/components/Testimonials'));
+const InstagramFeed = lazy(() => import('@/components/InstagramFeed'));
+const CTASection = lazy(() => import('@/components/CTASection'));
 
 const Index = () => {
   const { language } = useLanguage();
@@ -41,13 +43,41 @@ const Index = () => {
 
         <main className="min-h-screen bg-background">
           <Hero />
-          <TrustBadges />
-          <FeaturedProducts />
-          <Categories />
-          <SizeCalculator />
-          <Testimonials />
-          <InstagramFeed />
-          <CTASection />
+          <DeferredSection minHeight={220}>
+            <Suspense fallback={<div className="min-h-[220px]" />}>
+              <TrustBadges />
+            </Suspense>
+          </DeferredSection>
+          <DeferredSection minHeight={640}>
+            <Suspense fallback={<div className="min-h-[640px]" />}>
+              <FeaturedProducts />
+            </Suspense>
+          </DeferredSection>
+          <DeferredSection minHeight={520}>
+            <Suspense fallback={<div className="min-h-[520px]" />}>
+              <Categories />
+            </Suspense>
+          </DeferredSection>
+          <DeferredSection minHeight={520}>
+            <Suspense fallback={<div className="min-h-[520px]" />}>
+              <SizeCalculator />
+            </Suspense>
+          </DeferredSection>
+          <DeferredSection minHeight={720}>
+            <Suspense fallback={<div className="min-h-[720px]" />}>
+              <Testimonials />
+            </Suspense>
+          </DeferredSection>
+          <DeferredSection minHeight={640}>
+            <Suspense fallback={<div className="min-h-[640px]" />}>
+              <InstagramFeed />
+            </Suspense>
+          </DeferredSection>
+          <DeferredSection minHeight={360}>
+            <Suspense fallback={<div className="min-h-[360px]" />}>
+              <CTASection />
+            </Suspense>
+          </DeferredSection>
           <Footer />
         </main>
       </PageTransition>

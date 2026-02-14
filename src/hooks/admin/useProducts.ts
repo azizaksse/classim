@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { useToast } from "@/hooks/use-toast";
+import { Id } from "@convex/_generated/dataModel";
 
 export interface ProductVariant {
   size: string;
@@ -9,7 +10,8 @@ export interface ProductVariant {
 }
 
 export interface Product {
-  id: string;
+  _id: Id<"products">;
+  id: string; // keeping for compatibility, but should map to _id
   name: string;
   name_ar: string;
   name_fr: string;
@@ -17,87 +19,80 @@ export interface Product {
   rent_price: number;
   sale_price: number | null;
   category: string;
-  category_id: string | null;
+  category_id: Id<"categories"> | null;
   image: string;
   images: string[];
   variants: ProductVariant[];
   sizes: string[];
+  colors: string[];
   is_featured: boolean;
   is_active: boolean;
   createdAt: string;
+  image_data?: { id?: string; url: string }[];
 }
 
 export const useProducts = () => {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: products = [], isLoading } = useQuery({
-    queryKey: ["admin-products"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*, categories(name_fr)")
-        .order("created_at", { ascending: false });
+  const productsData = useQuery(api.products.get);
 
-      if (error) throw error;
+  const createProduct = useMutation(api.products.create);
+  const updateProductFn = useMutation(api.products.update);
+  const deleteProductFn = useMutation(api.products.remove);
 
-      return data.map((p: any) => ({
-        ...p,
-        name: p.name_fr,
-        price: p.rent_price,
-        image: p.images?.[0] || "",
-        category: p.categories?.name_fr || "Uncategorized",
-        variants: p.sizes?.map((s: string) => ({ size: s, color: "Default", stock: 10 })) || [], // Mocking variants for UI compatibility
-        createdAt: p.created_at,
-      })) as Product[];
-    },
-  });
+  const products: Product[] = (productsData || []).map((p: any) => ({
+    ...p,
+    id: p._id,
+    name: p.name_fr,
+    price: p.sale_price ?? p.rent_price,
+    image: p.images?.[0] || "",
+    category: p.category_name || "Uncategorized",
+    variants:
+      (p.sizes?.length || p.colors?.length)
+        ? (p.sizes?.length && p.colors?.length
+            ? p.sizes.flatMap((s: string) =>
+                p.colors.map((c: string) => ({ size: s, color: c, stock: 10 }))
+              )
+            : (p.sizes?.length
+                ? p.sizes.map((s: string) => ({ size: s, color: "Standard", stock: 10 }))
+                : p.colors.map((c: string) => ({ size: "Standard", color: c, stock: 10 }))))
+        : [],
+    createdAt: p.created_at || new Date().toISOString(),
+    image_data: p.image_data,
+  }));
 
-  const addProductMutation = useMutation({
-    mutationFn: async (newProduct: Omit<Product, "id" | "createdAt" | "name" | "price" | "image" | "category" | "variants">) => {
-      const { data, error } = await supabase.from("products").insert([newProduct]).select().single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+  const addProduct = async (newProduct: any) => {
+    try {
+      await createProduct(newProduct);
       toast({ title: "Product added successfully" });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({ title: "Error adding product", description: error.message, variant: "destructive" });
-    },
-  });
+    }
+  };
 
-  const updateProductMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Product> }) => {
-      // Remove UI-only fields before sending to Supabase
-      const { name, price, image, category, variants, createdAt, ...supabaseUpdates } = updates as any;
-      const { data, error } = await supabase.from("products").update(supabaseUpdates).eq("id", id).select().single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+  const updateProduct = async ({ id, updates }: { id: string; updates: Partial<Product> }) => {
+    try {
+      // Filter out UI-only fields
+      const { name, price, image, category, variants, createdAt, id: _, image_data, ...convexUpdates } = updates as any;
+
+      await updateProductFn({
+        id: id as Id<"products">,
+        updates: convexUpdates
+      });
       toast({ title: "Product updated successfully" });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({ title: "Error updating product", description: error.message, variant: "destructive" });
-    },
-  });
+    }
+  };
 
-  const deleteProductMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("products").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+  const deleteProduct = async (id: string) => {
+    try {
+      await deleteProductFn({ id: id as Id<"products"> });
       toast({ title: "Product deleted successfully" });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({ title: "Error deleting product", description: error.message, variant: "destructive" });
-    },
-  });
+    }
+  };
 
   const getTotalStock = (product: Product) => {
     return product.variants.reduce((sum, v) => sum + v.stock, 0);
@@ -105,10 +100,10 @@ export const useProducts = () => {
 
   return {
     products,
-    isLoading,
-    addProduct: addProductMutation.mutate,
-    updateProduct: updateProductMutation.mutate,
-    deleteProduct: deleteProductMutation.mutate,
+    isLoading: productsData === undefined,
+    addProduct,
+    updateProduct,
+    deleteProduct,
     getTotalStock,
   };
 };

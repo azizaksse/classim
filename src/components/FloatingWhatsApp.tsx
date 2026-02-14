@@ -11,8 +11,8 @@ const FloatingWhatsApp = () => {
 
   const whatsappMessage = encodeURIComponent(
     language === 'ar'
-      ? 'السلام عليكم، نحب نحجز كوستيم'
-      : 'Bonjour, je souhaite réserver un costume'
+      ? 'السلام عليكم، أحتاج مساعدة بخصوص الطلب'
+      : 'Bonjour, j\'ai besoin d\'aide concernant ma commande'
   );
 
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
@@ -50,8 +50,8 @@ const FloatingWhatsApp = () => {
 
             <p className="text-[15px] text-gray-300 mb-6 leading-relaxed text-right">
               {language === 'ar'
-                ? 'مرحباً! كيف يمكننا مساعدتك؟ اضغط للتواصل معنا مباشرة.'
-                : 'Bonjour! Comment pouvons-nous vous aider? Cliquez pour nous contacter.'}
+                ? 'مرحباً! هذا واتساب الدعم فقط للاستفسار أو حل المشاكل.'
+                : 'Bonjour! WhatsApp est reserve au support et aux questions.'}
             </p>
 
             <motion.a

@@ -5,13 +5,14 @@ import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import AnimatedSection from '@/components/AnimatedSection';
-import { products } from '@/data/products';
+import { useStoreProducts } from '@/hooks/useStoreProducts';
 
 const FeaturedProducts = () => {
   const { language, t, dir } = useLanguage();
 
-  // Get first 4 products for featured section
-  const featuredProducts = products.slice(0, 4);
+  const { products, isLoading } = useStoreProducts();
+  const featuredProducts = products.filter((p) => p.isFeatured);
+  const displayProducts = (featuredProducts.length > 0 ? featuredProducts : products).slice(0, 4);
 
   return (
     <section className="py-20 bg-background">
@@ -33,7 +34,12 @@ const FeaturedProducts = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {featuredProducts.map((product, index) => (
+          {isLoading ? (
+            <div className="col-span-full text-center text-muted-foreground">
+              {language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}
+            </div>
+          ) : (
+            displayProducts.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 30 }}
@@ -43,7 +49,8 @@ const FeaturedProducts = () => {
             >
               <ProductCard {...product} />
             </motion.div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </section>

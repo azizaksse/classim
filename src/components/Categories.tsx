@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AnimatedSection from '@/components/AnimatedSection';
-import { categories } from '@/data/products';
+import { useQuery } from 'convex/react';
+import { api } from '@convex/_generated/api';
+import { useStoreProducts } from '@/hooks/useStoreProducts';
 
 interface CategoryCardProps {
   id: string;
@@ -65,6 +67,8 @@ const CategoryCard = ({ id, nameAr, nameFr, image, count, index }: CategoryCardP
 
 const Categories = () => {
   const { language, t } = useLanguage();
+  const { products } = useStoreProducts();
+  const categoriesData = useQuery(api.categories.get);
 
   return (
     <section id="catalogue" className="py-20 bg-card/30">
@@ -78,9 +82,21 @@ const Categories = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((category, index) => (
-            <CategoryCard key={category.id} {...category} index={index} />
-          ))}
+          {(categoriesData || []).map((category: any, index: number) => {
+            const count = products.filter((p) => p.categoryId === category._id).length;
+            const imageUrl = category.image_data?.[0]?.url || category.image_url || "/placeholder.svg";
+            return (
+              <CategoryCard
+                key={category._id}
+                id={category._id}
+                nameAr={category.name_ar}
+                nameFr={category.name_fr}
+                image={imageUrl}
+                count={count}
+                index={index}
+              />
+            );
+          })}
         </div>
       </div>
     </section>

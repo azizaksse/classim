@@ -20,7 +20,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
     const observer = new MutationObserver(checkSidebarState);
     const sidebar = document.querySelector('aside');
-    
+
     if (sidebar) {
       observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
     }
@@ -29,7 +29,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background dark">
+    <div className="min-h-screen bg-background text-foreground">
       <AdminSidebar />
       <main
         className={cn(

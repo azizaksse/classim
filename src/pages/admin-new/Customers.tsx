@@ -32,10 +32,8 @@ import {
 import { cn } from "@/lib/utils";
 
 const statusStyles = {
-  vip: "bg-accent/10 text-accent border-accent/20",
   active: "bg-success/10 text-success border-success/20",
   new: "bg-info/10 text-info border-info/20",
-  inactive: "bg-muted text-muted-foreground border-muted",
 };
 
 const Customers = () => {
@@ -49,17 +47,19 @@ const Customers = () => {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data.map((p: any) => ({
-        id: p.id,
-        name: p.full_name || "Anonymous",
-        email: p.email || "No email",
-        phone: p.phone || "No phone",
-        orders: 0, // Mocked as there's no orders table
-        totalSpent: "0 DA", // Mocked
-        status: "active", // Default status
-        joinDate: new Date(p.created_at).toLocaleDateString(),
-        lastOrder: "N/A",
-      }));
+      const now = Date.now();
+      return data.map((p: any) => {
+        const createdAt = new Date(p.created_at);
+        const isNew = now - createdAt.getTime() < 1000 * 60 * 60 * 24 * 30;
+        return {
+          id: p.id,
+          name: p.full_name || "Anonymous",
+          email: p.email || "No email",
+          phone: p.phone || "—",
+          status: isNew ? "new" : "active",
+          joinDate: createdAt.toLocaleDateString(),
+        };
+      });
     },
   });
 
@@ -113,20 +113,22 @@ const Customers = () => {
             </p>
           </div>
           <div className="card-luxury p-4">
-            <p className="text-sm text-muted-foreground">VIP Customers</p>
-            <p className="text-2xl font-heading font-semibold mt-1 text-accent">
-              {customers.filter((c) => c.status === "vip").length}
-            </p>
-          </div>
-          <div className="card-luxury p-4">
             <p className="text-sm text-muted-foreground">New This Month</p>
             <p className="text-2xl font-heading font-semibold mt-1">
               {customers.filter((c) => c.status === "new").length}
             </p>
           </div>
           <div className="card-luxury p-4">
-            <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-heading font-semibold mt-1">0 DA</p>
+            <p className="text-sm text-muted-foreground">With Email</p>
+            <p className="text-2xl font-heading font-semibold mt-1">
+              {customers.filter((c) => c.email && c.email !== "No email").length}
+            </p>
+          </div>
+          <div className="card-luxury p-4">
+            <p className="text-sm text-muted-foreground">With Phone</p>
+            <p className="text-2xl font-heading font-semibold mt-1">
+              {customers.filter((c) => c.phone && c.phone !== "—").length}
+            </p>
           </div>
         </div>
 
@@ -154,8 +156,6 @@ const Customers = () => {
               <TableRow className="hover:bg-transparent">
                 <TableHead>Customer</TableHead>
                 <TableHead>Phone</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead>Total Spent</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Join Date</TableHead>
                 <TableHead className="w-[70px]"></TableHead>
@@ -189,10 +189,6 @@ const Customers = () => {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {customer.phone}
-                  </TableCell>
-                  <TableCell>{customer.orders}</TableCell>
-                  <TableCell className="font-semibold">
-                    {customer.totalSpent}
                   </TableCell>
                   <TableCell>
                     <Badge

@@ -1,24 +1,29 @@
+import { useQuery as useConvexQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin-new/layout/AdminLayout";
 import { MetricCard } from "@/components/admin-new/dashboard/MetricCard";
 import { RevenueChart } from "@/components/admin-new/dashboard/RevenueChart";
-import { RecentOrders } from "@/components/admin-new/dashboard/RecentOrders";
+import { RecentCustomers } from "@/components/admin-new/dashboard/RecentOrders";
 import { TopProducts } from "@/components/admin-new/dashboard/TopProducts";
-import { DollarSign, ShoppingCart, Users, Package } from "lucide-react";
+import { FolderOpen, Users, Package, CheckCircle2 } from "lucide-react";
 
 const Dashboard = () => {
-  const { data: productsCount = 0 } = useQuery({
-    queryKey: ["admin-products-count"],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from("products")
-        .select("*", { count: "exact", head: true });
-      return count || 0;
-    },
-  });
+  const productsData = useConvexQuery(api.products.get);
+  const categoriesData = useConvexQuery(api.categories.get);
 
-  const { data: usersCount = 0 } = useQuery({
+  const productsLoading = productsData === undefined;
+  const categoriesLoading = categoriesData === undefined;
+
+  const products = productsData || [];
+  const categories = categoriesData || [];
+
+  const activeProductsCount = products.filter(
+    (p: any) => p.is_active !== false
+  ).length;
+
+  const { data: usersCount = 0, isLoading: usersLoading } = useQuery({
     queryKey: ["admin-users-count"],
     queryFn: async () => {
       const { count } = await supabase
@@ -28,13 +33,21 @@ const Dashboard = () => {
     },
   });
 
-  const { data: categoriesCount = 0 } = useQuery({
-    queryKey: ["admin-categories-count"],
+  const { data: recentCustomers = [], isLoading: recentCustomersLoading } = useQuery({
+    queryKey: ["admin-recent-customers"],
     queryFn: async () => {
-      const { count } = await supabase
-        .from("categories")
-        .select("*", { count: "exact", head: true });
-      return count || 0;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, created_at")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        name: row.full_name || "Anonymous",
+        email: row.email || "No email",
+        created_at: row.created_at,
+      }));
     },
   });
 
@@ -54,45 +67,41 @@ const Dashboard = () => {
         {/* Metrics Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
-            title="Total Revenue"
-            value="0 DA"
-            change={0}
-            changeLabel="vs last month"
-            icon={<DollarSign className="h-5 w-5" />}
-          />
-          <MetricCard
             title="Total Products"
-            value={productsCount.toString()}
-            change={0}
-            changeLabel="total items"
+            value={productsLoading ? "..." : products.length.toString()}
             icon={<Package className="h-5 w-5" />}
           />
           <MetricCard
+            title="Active Products"
+            value={productsLoading ? "..." : activeProductsCount.toString()}
+            icon={<CheckCircle2 className="h-5 w-5" />}
+          />
+          <MetricCard
             title="Total Customers"
-            value={usersCount.toString()}
-            change={0}
-            changeLabel="registered users"
+            value={usersLoading ? "..." : usersCount.toString()}
             icon={<Users className="h-5 w-5" />}
           />
           <MetricCard
             title="Categories"
-            value={categoriesCount.toString()}
-            change={0}
-            changeLabel="active categories"
-            icon={<ShoppingCart className="h-5 w-5" />}
+            value={categoriesLoading ? "..." : categories.length.toString()}
+            icon={<FolderOpen className="h-5 w-5" />}
           />
         </div>
 
         {/* Charts Row */}
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <RevenueChart />
+            <RevenueChart
+              categories={categories}
+              products={products}
+              isLoading={categoriesLoading || productsLoading}
+            />
           </div>
-          <TopProducts />
+          <TopProducts products={products} isLoading={productsLoading} />
         </div>
 
         {/* Recent Orders */}
-        <RecentOrders />
+        <RecentCustomers customers={recentCustomers} isLoading={recentCustomersLoading} />
       </div>
     </AdminLayout>
   );

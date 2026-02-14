@@ -9,16 +9,20 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
-import { products, categories } from '@/data/products';
+import { useQuery } from 'convex/react';
+import { api } from '@convex/_generated/api';
+import { useStoreProducts } from '@/hooks/useStoreProducts';
 
 const Catalogue = () => {
   const { language, t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
+  const { products, isLoading } = useStoreProducts();
+  const categoriesData = useQuery(api.categories.get);
 
   const filteredProducts = activeCategory === 'all'
     ? products
-    : products.filter(p => p.category === activeCategory);
+    : products.filter(p => p.categoryId === activeCategory);
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -32,7 +36,11 @@ const Catalogue = () => {
 
   const allCategories = [
     { id: 'all', nameAr: 'الكل', nameFr: 'Tout' },
-    ...categories,
+    ...(categoriesData || []).map((c: any) => ({
+      id: c._id,
+      nameAr: c.name_ar,
+      nameFr: c.name_fr,
+    })),
   ];
 
   const title = language === 'ar'
@@ -93,21 +101,27 @@ const Catalogue = () => {
                   transition={{ duration: 0.3 }}
                   className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
                 >
-                  {filteredProducts.map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05, duration: 0.4 }}
-                    >
-                      <ProductCard {...product} />
-                    </motion.div>
-                  ))}
+                  {isLoading ? (
+                    <div className="col-span-full text-center text-muted-foreground">
+                      {language === 'ar' ? 'جاري التحميل...' : 'Chargement...'}
+                    </div>
+                  ) : (
+                    filteredProducts.map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.4 }}
+                      >
+                        <ProductCard {...product} />
+                      </motion.div>
+                    ))
+                  )}
                 </motion.div>
               </AnimatePresence>
 
               {/* Empty State */}
-              {filteredProducts.length === 0 && (
+              {!isLoading && filteredProducts.length === 0 && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

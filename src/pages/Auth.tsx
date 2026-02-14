@@ -93,7 +93,15 @@ const Auth = () => {
             {/* Logo */}
             <div className="flex justify-center mb-6">
               <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-primary/50">
-                <img src={logo} alt="Classimo" className="w-full h-full object-cover" />
+                <img
+                  src={logo}
+                  alt="Classimo"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  width={80}
+                  height={80}
+                />
               </div>
             </div>
 

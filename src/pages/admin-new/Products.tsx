@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AdminLayout } from "@/components/admin-new/layout/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,13 +87,21 @@ const Products = () => {
               {products.length} products in inventory
             </p>
           </div>
-          <Button
-            onClick={() => setShowAddForm(true)}
-            className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-gold"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/admin/categories">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Category
+              </Link>
+            </Button>
+            <Button
+              onClick={() => setShowAddForm(true)}
+              className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-gold"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}

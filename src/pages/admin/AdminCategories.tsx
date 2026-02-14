@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@convex/_generated/api';
+import { Id } from '@convex/_generated/dataModel';
 import AdminGuard from '@/components/AdminGuard';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -11,9 +12,10 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
-import ImageUpload from '@/components/ImageUpload';
+import ImageUpload, { UploadedImage } from '@/components/ImageUpload';
 
 interface Category {
+  _id: Id<"categories">;
   id: string;
   name_ar: string;
   name_fr: string;
@@ -27,75 +29,22 @@ const AdminCategories = () => {
   const [formData, setFormData] = useState({
     name_ar: '',
     name_fr: '',
-    image_url: [] as string[],
+    image_url: [] as UploadedImage[],
   });
 
-  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: categories, isLoading } = useQuery({
-    queryKey: ['admin-categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data as Category[];
-    },
-  });
+  const categoriesData = useQuery(api.categories.get);
+  const createCategory = useMutation(api.categories.create);
+  const updateCategory = useMutation(api.categories.update);
+  const deleteCategory = useMutation(api.categories.remove);
 
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from('categories').insert({
-        name_ar: data.name_ar,
-        name_fr: data.name_fr,
-        image_url: data.image_url[0] || null,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
-      toast({ title: 'Category created successfully!' });
-      resetForm();
-    },
-    onError: (error) => {
-      toast({ title: 'Error creating category', description: error.message, variant: 'destructive' });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
-      const { error } = await supabase.from('categories').update({
-        name_ar: data.name_ar,
-        name_fr: data.name_fr,
-        image_url: data.image_url[0] || null,
-      }).eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
-      toast({ title: 'Category updated successfully!' });
-      resetForm();
-    },
-    onError: (error) => {
-      toast({ title: 'Error updating category', description: error.message, variant: 'destructive' });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from('categories').delete().eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
-      toast({ title: 'Category deleted successfully!' });
-    },
-    onError: (error) => {
-      toast({ title: 'Error deleting category', description: error.message, variant: 'destructive' });
-    },
-  });
+  const categories: Category[] = (categoriesData || []).map((c: any) => ({
+    ...c,
+    id: c._id,
+    image_url: c.image_url || null,
+    created_at: c.created_at || new Date().toISOString(),
+  }));
 
   const resetForm = () => {
     setFormData({ name_ar: '', name_fr: '', image_url: [] });
@@ -108,17 +57,46 @@ const AdminCategories = () => {
     setFormData({
       name_ar: category.name_ar,
       name_fr: category.name_fr,
-      image_url: category.image_url ? [category.image_url] : [],
+      image_url: category.image_url ? [{ url: category.image_url }] : [],
     });
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingCategory) {
-      updateMutation.mutate({ id: editingCategory.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
+    try {
+      const imageUrl = formData.image_url[0]?.id || formData.image_url[0]?.url;
+
+      if (editingCategory) {
+        await updateCategory({
+          id: editingCategory._id,
+          updates: {
+            name_ar: formData.name_ar,
+            name_fr: formData.name_fr,
+            image_url: imageUrl || undefined,
+          }
+        });
+        toast({ title: 'Category updated successfully!' });
+      } else {
+        await createCategory({
+          name_ar: formData.name_ar,
+          name_fr: formData.name_fr,
+          image_url: imageUrl || undefined,
+        });
+        toast({ title: 'Category created successfully!' });
+      }
+      resetForm();
+    } catch (error: any) {
+      toast({ title: 'Error saving category', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDelete = async (id: Id<"categories">) => {
+    try {
+      await deleteCategory({ id });
+      toast({ title: 'Category deleted successfully!' });
+    } catch (error: any) {
+      toast({ title: 'Error deleting category', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -189,7 +167,7 @@ const AdminCategories = () => {
           </div>
 
           {/* Categories Grid */}
-          {isLoading ? (
+          {categoriesData === undefined ? (
             <div className="text-center text-muted-foreground py-8">Loading...</div>
           ) : categories?.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">No categories found</div>
@@ -227,7 +205,7 @@ const AdminCategories = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => deleteMutation.mutate(category.id)}
+                        onClick={() => handleDelete(category._id)}
                         className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="w-4 h-4 mr-1" />

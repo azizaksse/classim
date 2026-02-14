@@ -1,30 +1,39 @@
 import { useState, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+export interface UploadedImage {
+  id?: string; // storageId
+  url: string;
+}
+
 interface ImageUploadProps {
-  value: string[];
-  onChange: (urls: string[]) => void;
+  value: UploadedImage[];
+  onChange: (images: UploadedImage[]) => void;
   bucket?: string;
   multiple?: boolean;
   maxFiles?: number;
   className?: string;
 }
 
-const ImageUpload = ({ 
-  value = [], 
-  onChange, 
+const ImageUpload = ({
+  value = [],
+  onChange,
   bucket = 'product-images',
   multiple = true,
   maxFiles = 5,
-  className 
+  className
 }: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const getFileUrl = useMutation(api.files.getFileUrl);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -42,11 +51,10 @@ const ImageUpload = ({
     }
 
     setIsUploading(true);
-    const uploadedUrls: string[] = [];
+    const newImages: UploadedImage[] = [];
 
     try {
       for (const file of filesToUpload) {
-        // Validate file type
         if (!file.type.startsWith('image/')) {
           toast({
             title: 'Invalid file type',
@@ -55,8 +63,6 @@ const ImageUpload = ({
           });
           continue;
         }
-
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
           toast({
             title: 'File too large',
@@ -66,44 +72,37 @@ const ImageUpload = ({
           continue;
         }
 
-        // Generate unique filename
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `uploads/${fileName}`;
+        // 1. Generate Upload URL
+        const postUrl = await generateUploadUrl();
 
-        const { error: uploadError } = await supabase.storage
-          .from(bucket)
-          .upload(filePath, file);
+        // 2. POST file
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+        const { storageId } = await result.json();
 
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          toast({
-            title: 'Upload failed',
-            description: uploadError.message,
-            variant: 'destructive',
-          });
-          continue;
+        // 3. Get URL for preview
+        const url = await getFileUrl({ storageId });
+
+        if (url) {
+          newImages.push({ id: storageId, url });
         }
-
-        const { data: urlData } = supabase.storage
-          .from(bucket)
-          .getPublicUrl(filePath);
-
-        uploadedUrls.push(urlData.publicUrl);
       }
 
-      if (uploadedUrls.length > 0) {
-        onChange([...value, ...uploadedUrls]);
+      if (newImages.length > 0) {
+        onChange([...value, ...newImages]);
         toast({
           title: 'Upload successful',
-          description: `${uploadedUrls.length} image(s) uploaded`,
+          description: `${newImages.length} image(s) uploaded`,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
       toast({
         title: 'Upload failed',
-        description: 'An unexpected error occurred',
+        description: error.message || 'An unexpected error occurred',
         variant: 'destructive',
       });
     } finally {
@@ -114,18 +113,8 @@ const ImageUpload = ({
     }
   };
 
-  const removeImage = async (urlToRemove: string) => {
-    // Extract file path from URL
-    const urlParts = urlToRemove.split('/');
-    const bucketIndex = urlParts.findIndex(part => part === bucket);
-    if (bucketIndex !== -1) {
-      const filePath = urlParts.slice(bucketIndex + 1).join('/');
-      
-      // Try to delete from storage (don't block on failure)
-      supabase.storage.from(bucket).remove([filePath]).catch(console.error);
-    }
-
-    onChange(value.filter(url => url !== urlToRemove));
+  const removeImage = (urlToRemove: string) => {
+    onChange(value.filter(img => img.url !== urlToRemove));
   };
 
   return (
@@ -133,16 +122,16 @@ const ImageUpload = ({
       {/* Image Preview Grid */}
       {value.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
-          {value.map((url, index) => (
+          {value.map((img, index) => (
             <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-secondary group">
               <img
-                src={url}
+                src={img.url}
                 alt={`Upload ${index + 1}`}
                 className="w-full h-full object-cover"
               />
               <button
                 type="button"
-                onClick={() => removeImage(url)}
+                onClick={() => removeImage(img.url)}
                 className="absolute top-1 right-1 p-1 bg-destructive/90 text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="w-3 h-3" />

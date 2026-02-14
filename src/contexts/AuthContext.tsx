@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useConvex } from "convex/react";
+import { api } from "@convex/_generated/api";
 
 interface AuthContextType {
   user: User | null;
@@ -20,33 +22,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const convex = useConvex();
+
   const checkAdminRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('role', 'admin')
-      .maybeSingle();
-    
-    if (error) {
+    try {
+      const role = await convex.query(api.users.getUserRole, { userId });
+      return role === 'admin';
+    } catch (error) {
       console.error('Error checking admin role:', error);
       return false;
     }
-    return !!data;
   };
 
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Defer admin check with setTimeout to prevent deadlock
+
+        // Check admin role directly
         if (session?.user) {
-          setTimeout(() => {
-            checkAdminRole(session.user.id).then(setIsAdmin);
-          }, 0);
+          const isUserAdmin = await checkAdminRole(session.user.id);
+          setIsAdmin(isUserAdmin);
         } else {
           setIsAdmin(false);
         }
@@ -54,12 +52,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
-        checkAdminRole(session.user.id).then(setIsAdmin);
+        const isUserAdmin = await checkAdminRole(session.user.id);
+        setIsAdmin(isUserAdmin);
       }
       setIsLoading(false);
     });

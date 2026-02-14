@@ -18,7 +18,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Hero
     'hero.title': 'كراء و بيع كوستيم الأفراح',
-    'hero.subtitle': 'موديلات فاخرة • قياسات متعددة • حجز سريع عبر واتساب',
+    'hero.subtitle': 'موديلات فاخرة • قياسات متعددة • طلب سريع وآمن',
     'hero.cta.primary': 'احجز الآن',
     'hero.cta.secondary': 'تصفح الكتالوج',
     
@@ -27,21 +27,9 @@ const translations: Record<Language, Record<string, string>> = {
     'trust.payment': 'دفع عند الاستلام',
     'trust.size': 'تأكيد المقاس قبل الإرسال',
     
-    // Size Calculator
-    'size.title': 'اكتشف مقاسك المثالي',
-    'size.subtitle': 'أدخل طولك ووزنك لنقترح لك المقاس الأنسب',
-    'size.height': 'الطول (سم)',
-    'size.weight': 'الوزن (كغ)',
-    'size.calculate': 'احسب مقاسي',
-    'size.result': 'مقاسك المقترح',
-    'size.fit': 'القصة',
-    'size.fit.slim': 'ضيق',
-    'size.fit.regular': 'عادي',
-    'size.confidence': 'الدقة',
-    'size.confidence.high': 'عالية',
-    'size.confidence.medium': 'متوسطة',
-    'size.disclaimer': 'المقاس المقترح تقريبي ونؤكده معك قبل الإرسال',
-    'size.cta': 'احجز بهذا المقاس',
+    // Size Chart
+    'size.title': 'المقاسات المتوفرة',
+    'size.subtitle': '',
     
     // Categories
     'category.costumes': 'كوستيم',
@@ -53,7 +41,7 @@ const translations: Record<Language, Record<string, string>> = {
     'product.rent': 'كراء',
     'product.sale': 'بيع',
     'product.sizes': 'المقاسات المتوفرة',
-    'product.cta': 'احجز عبر واتساب',
+    'product.cta': 'اطلب الآن',
     'product.delivery': 'توصيل مجاني لكل الولايات',
     'product.cod': 'الدفع عند الاستلام',
     
@@ -71,7 +59,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // CTA
     'cta.title': 'جاهز لتتألق في مناسبتك؟',
-    'cta.subtitle': 'تواصل معنا الآن واحجز كوستيمك المثالي',
+    'cta.subtitle': 'اطلب الآن وتم تأكيد طلبك بسرعة',
   },
   fr: {
     // Navigation
@@ -81,7 +69,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Hero
     'hero.title': 'Location & Vente de Costumes de Mariage',
-    'hero.subtitle': 'Modèles premium • Tailles variées • Réservation via WhatsApp',
+    'hero.subtitle': 'Modeles premium • Tailles variees • Commande rapide et securisee',
     'hero.cta.primary': 'Réserver maintenant',
     'hero.cta.secondary': 'Voir le catalogue',
     
@@ -90,21 +78,9 @@ const translations: Record<Language, Record<string, string>> = {
     'trust.payment': 'Paiement à la livraison',
     'trust.size': 'Taille confirmée avant envoi',
     
-    // Size Calculator
-    'size.title': 'Trouvez votre taille idéale',
-    'size.subtitle': 'Entrez votre taille et poids pour une recommandation personnalisée',
-    'size.height': 'Taille (cm)',
-    'size.weight': 'Poids (kg)',
-    'size.calculate': 'Calculer ma taille',
-    'size.result': 'Taille recommandée',
-    'size.fit': 'Coupe',
-    'size.fit.slim': 'Slim',
-    'size.fit.regular': 'Regular',
-    'size.confidence': 'Précision',
-    'size.confidence.high': 'Haute',
-    'size.confidence.medium': 'Moyenne',
-    'size.disclaimer': 'Taille estimée, confirmée avec vous avant l\'envoi',
-    'size.cta': 'Réserver avec cette taille',
+    // Size Chart
+    'size.title': 'Guide des tailles',
+    'size.subtitle': '',
     
     // Categories
     'category.costumes': 'Costumes',
@@ -116,7 +92,7 @@ const translations: Record<Language, Record<string, string>> = {
     'product.rent': 'Location',
     'product.sale': 'Vente',
     'product.sizes': 'Tailles disponibles',
-    'product.cta': 'Réserver via WhatsApp',
+    'product.cta': 'Commander maintenant',
     'product.delivery': 'Livraison gratuite nationale',
     'product.cod': 'Paiement à la livraison',
     
@@ -134,7 +110,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // CTA
     'cta.title': 'Prêt à briller lors de votre événement ?',
-    'cta.subtitle': 'Contactez-nous maintenant et réservez votre costume idéal',
+    'cta.subtitle': 'Passez votre commande maintenant et confirmez rapidement',
   },
 };
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from 'convex/react';
+import { api } from '@convex/_generated/api';
 import AdminGuard from '@/components/AdminGuard';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -11,25 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Search, X } from 'lucide-react';
-import ImageUpload from '@/components/ImageUpload';
-
-interface Product {
-  id: string;
-  name_ar: string;
-  name_fr: string;
-  description_ar: string | null;
-  description_fr: string | null;
-  images: string[];
-  rent_price: number;
-  sale_price: number | null;
-  sizes: string[];
-  category_id: string | null;
-  is_featured: boolean;
-  is_active: boolean;
-  categories?: { name_fr: string } | null;
-}
+import ImageUpload, { UploadedImage } from '@/components/ImageUpload';
+import { useProducts, Product } from '@/hooks/admin/useProducts';
 
 interface Category {
   id: string;
@@ -46,7 +30,7 @@ const AdminProducts = () => {
     name_fr: '',
     description_ar: '',
     description_fr: '',
-    images: [] as string[],
+    images: [] as UploadedImage[],
     rent_price: 0,
     sale_price: 0,
     sizes: '',
@@ -55,100 +39,14 @@ const AdminProducts = () => {
     is_active: true,
   });
 
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
+  const { products, isLoading, addProduct, updateProduct, deleteProduct } = useProducts();
 
-  const { data: products, isLoading } = useQuery({
-    queryKey: ['admin-products'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*, categories(name_fr)')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data as Product[];
-    },
-  });
-
-  const { data: categories } = useQuery({
-    queryKey: ['admin-categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name_fr');
-      if (error) throw error;
-      return data as Category[];
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from('products').insert({
-        name_ar: data.name_ar,
-        name_fr: data.name_fr,
-        description_ar: data.description_ar || null,
-        description_fr: data.description_fr || null,
-        images: data.images,
-        rent_price: data.rent_price,
-        sale_price: data.sale_price || null,
-        sizes: data.sizes.split(',').map(s => s.trim()).filter(Boolean),
-        category_id: data.category_id || null,
-        is_featured: data.is_featured,
-        is_active: data.is_active,
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast({ title: 'Product created successfully!' });
-      resetForm();
-    },
-    onError: (error) => {
-      toast({ title: 'Error creating product', description: error.message, variant: 'destructive' });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
-      const { error } = await supabase.from('products').update({
-        name_ar: data.name_ar,
-        name_fr: data.name_fr,
-        description_ar: data.description_ar || null,
-        description_fr: data.description_fr || null,
-        images: data.images,
-        rent_price: data.rent_price,
-        sale_price: data.sale_price || null,
-        sizes: data.sizes.split(',').map(s => s.trim()).filter(Boolean),
-        category_id: data.category_id || null,
-        is_featured: data.is_featured,
-        is_active: data.is_active,
-      }).eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast({ title: 'Product updated successfully!' });
-      resetForm();
-    },
-    onError: (error) => {
-      toast({ title: 'Error updating product', description: error.message, variant: 'destructive' });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from('products').delete().eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast({ title: 'Product deleted successfully!' });
-    },
-    onError: (error) => {
-      toast({ title: 'Error deleting product', description: error.message, variant: 'destructive' });
-    },
-  });
+  const categoriesData = useQuery(api.categories.get);
+  const categories: Category[] = (categoriesData || []).map((c: any) => ({
+    id: c._id,
+    name_ar: c.name_ar,
+    name_fr: c.name_fr,
+  }));
 
   const resetForm = () => {
     setFormData({
@@ -170,12 +68,16 @@ const AdminProducts = () => {
 
   const openEditDialog = (product: Product) => {
     setEditingProduct(product);
+    const images: UploadedImage[] = product.image_data
+      ? product.image_data
+      : (product.images || []).map(url => ({ url }));
+
     setFormData({
       name_ar: product.name_ar,
       name_fr: product.name_fr,
-      description_ar: product.description_ar || '',
-      description_fr: product.description_fr || '',
-      images: product.images || [],
+      description_ar: (product as any).description_ar || '',
+      description_fr: (product as any).description_fr || '',
+      images: images,
       rent_price: product.rent_price,
       sale_price: product.sale_price || 0,
       sizes: product.sizes.join(', '),
@@ -186,17 +88,25 @@ const AdminProducts = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const productData = {
+      ...formData,
+      sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
+      category_id: formData.category_id || undefined,
+      images: formData.images.map(img => img.id || img.url),
+    };
+
     if (editingProduct) {
-      updateMutation.mutate({ id: editingProduct.id, data: formData });
+      await updateProduct({ id: editingProduct.id, updates: productData });
     } else {
-      createMutation.mutate(formData);
+      await addProduct(productData);
     }
+    resetForm();
   };
 
   const filteredProducts = products?.filter(p =>
-    p.name_fr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.name_ar.includes(searchQuery)
   );
 
@@ -413,28 +323,27 @@ const AdminProducts = () => {
                             {product.images[0] && (
                               <img
                                 src={product.images[0]}
-                                alt={product.name_fr}
+                                alt={product.name}
                                 className="w-12 h-12 rounded-lg object-cover"
                               />
                             )}
                             <div>
-                              <p className="font-medium">{product.name_fr}</p>
+                              <p className="font-medium">{product.name}</p>
                               <p className="text-sm text-muted-foreground" dir="rtl">{product.name_ar}</p>
                             </div>
                           </div>
                         </td>
                         <td className="p-4 text-muted-foreground">
-                          {product.categories?.name_fr || '-'}
+                          {product.category || '-'}
                         </td>
                         <td className="p-4">
                           {product.rent_price.toLocaleString()} DA
                         </td>
                         <td className="p-4">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            product.is_active
-                              ? 'bg-green-500/20 text-green-500'
-                              : 'bg-red-500/20 text-red-500'
-                          }`}>
+                          <span className={`px-2 py-1 rounded-full text-xs ${product.is_active
+                            ? 'bg-green-500/20 text-green-500'
+                            : 'bg-red-500/20 text-red-500'
+                            }`}>
                             {product.is_active ? 'Active' : 'Inactive'}
                           </span>
                         </td>
@@ -450,7 +359,7 @@ const AdminProducts = () => {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => deleteMutation.mutate(product.id)}
+                              onClick={() => deleteProduct(product.id)}
                               className="text-destructive hover:text-destructive"
                             >
                               <Trash2 className="w-4 h-4" />

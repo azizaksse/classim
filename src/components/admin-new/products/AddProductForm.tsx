@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
-import ImageUpload from "@/components/ImageUpload";
+import ImageUpload, { UploadedImage } from "@/components/ImageUpload";
 
 interface AddProductFormProps {
   open: boolean;
@@ -39,25 +39,19 @@ export const AddProductForm = ({
   const [nameFr, setNameFr] = useState(product?.name_fr || "");
   const [descriptionAr, setDescriptionAr] = useState(product?.description_ar || "");
   const [descriptionFr, setDescriptionFr] = useState(product?.description_fr || "");
-  const [rentPrice, setRentPrice] = useState(product?.rent_price?.toString() || "");
-  const [salePrice, setSalePrice] = useState(product?.sale_price?.toString() || "");
+  const [salePrice, setSalePrice] = useState(
+    product?.sale_price?.toString() || product?.rent_price?.toString() || ""
+  );
   const [categoryId, setCategoryId] = useState(product?.category_id || "");
-  const [images, setImages] = useState<string[]>(product?.images || []);
+  const [images, setImages] = useState<UploadedImage[]>(
+    (product?.images || []).map((url: string) => ({ url }))
+  );
   const [sizes, setSizes] = useState<string[]>(product?.sizes || ["M"]);
+  const [colors, setColors] = useState<string[]>(product?.colors || ["Black"]);
   const [isFeatured, setIsFeatured] = useState(product?.is_featured || false);
   const [isActive, setIsActive] = useState(product?.is_active || true);
 
-  const { data: categories } = useQuery({
-    queryKey: ["admin-categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("*")
-        .order("name_fr");
-      if (error) throw error;
-      return data;
-    },
-  });
+  const categories = useQuery(api.categories.get);
 
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,8 +61,8 @@ export const AddProductForm = ({
       toast.error("Please enter product names in both languages");
       return;
     }
-    if (!rentPrice || parseFloat(rentPrice) <= 0) {
-      toast.error("Please enter a valid rent price");
+    if (!salePrice || parseFloat(salePrice) <= 0) {
+      toast.error("Please enter a valid price");
       return;
     }
 
@@ -77,11 +71,15 @@ export const AddProductForm = ({
       name_fr: nameFr.trim(),
       description_ar: descriptionAr.trim(),
       description_fr: descriptionFr.trim(),
-      rent_price: parseFloat(rentPrice),
-      sale_price: salePrice ? parseFloat(salePrice) : null,
-      category_id: categoryId || null,
-      images: images.length > 0 ? images : ["/placeholder.svg"],
+      rent_price: parseFloat(salePrice),
+      sale_price: parseFloat(salePrice),
+      category_id: categoryId || undefined,
+      images:
+        images.length > 0
+          ? images.map((img) => img.id || img.url)
+          : ["/placeholder.svg"],
       sizes,
+      colors,
       is_featured: isFeatured,
       is_active: isActive,
     });
@@ -91,11 +89,11 @@ export const AddProductForm = ({
     setNameFr("");
     setDescriptionAr("");
     setDescriptionFr("");
-    setRentPrice("");
     setSalePrice("");
     setCategoryId("");
     setImages([]);
     setSizes(["M"]);
+    setColors(["Black"]);
     onOpenChange(false);
   };
 
@@ -158,19 +156,9 @@ export const AddProductForm = ({
           </div>
 
           {/* Prices & Category */}
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="rent_price">Rent Price (DA) *</Label>
-              <Input
-                id="rent_price"
-                type="number"
-                value={rentPrice}
-                onChange={(e) => setRentPrice(e.target.value)}
-                className="input-luxury"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="sale_price">Sale Price (DA)</Label>
+              <Label htmlFor="sale_price">Price (DA) *</Label>
               <Input
                 id="sale_price"
                 type="number"
@@ -187,7 +175,7 @@ export const AddProductForm = ({
                 </SelectTrigger>
                 <SelectContent>
                   {categories?.map((cat: any) => (
-                    <SelectItem key={cat.id} value={cat.id}>
+                    <SelectItem key={cat._id} value={cat._id}>
                       {cat.name_fr}
                     </SelectItem>
                   ))}
@@ -229,6 +217,47 @@ export const AddProductForm = ({
                     const val = e.currentTarget.value.trim();
                     if (val && !sizes.includes(val)) {
                       setSizes([...sizes, val]);
+                      e.currentTarget.value = "";
+                    }
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Colors */}
+          <div className="space-y-2">
+            <Label>Available Colors</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {["Black", "White", "Navy", "Gray", "Beige", "Brown", "Green", "Burgundy"].map((color) => (
+                <Button
+                  key={color}
+                  type="button"
+                  variant={colors.includes(color) ? "gold" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    if (colors.includes(color)) {
+                      setColors(colors.filter((c) => c !== color));
+                    } else {
+                      setColors([...colors, color]);
+                    }
+                  }}
+                  className="h-8 px-3"
+                >
+                  {color}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Add custom color..."
+                className="input-luxury h-8"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    const val = e.currentTarget.value.trim();
+                    if (val && !colors.includes(val)) {
+                      setColors([...colors, val]);
                       e.currentTarget.value = "";
                     }
                   }

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { MessageCircle } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 
 interface ProductCardProps {
   id: string;
@@ -10,20 +10,14 @@ interface ProductCardProps {
   nameFr: string;
   images: string[];
   rentPrice: number;
-  salePrice?: number;
   sizes: string[];
-  category: string;
+  categoryId?: string;
 }
 
-const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }: ProductCardProps) => {
+const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, sizes }: ProductCardProps) => {
   const { language, t } = useLanguage();
 
-  const whatsappNumber = '213795443714';
   const productName = language === 'ar' ? nameAr : nameFr;
-  const message = language === 'ar'
-    ? `السلام عليكم، أريد الاستفسار عن: ${productName}`
-    : `Bonjour, je voudrais des informations sur: ${productName}`;
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   return (
     <motion.div
@@ -74,23 +68,9 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
               {language === 'ar' ? 'دج' : 'DA'}
             </span>
             <span className="text-[10px] text-muted-foreground font-medium ml-1">
-              {t('product.rent')}
+              {language === 'ar' ? 'السعر' : 'Prix'}
             </span>
           </div>
-
-          {salePrice && (
-            <div className="flex items-baseline gap-1 border-l border-border/50 pl-3">
-              <span className="text-foreground font-bold">
-                {salePrice.toLocaleString()}
-              </span>
-              <span className="text-[10px] text-muted-foreground font-bold uppercase">
-                {language === 'ar' ? 'دج' : 'DA'}
-              </span>
-              <span className="text-[10px] text-muted-foreground font-medium ml-1">
-                {t('product.sale')}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Sizes */}
@@ -115,15 +95,15 @@ const ProductCard = ({ id, nameAr, nameFr, images, rentPrice, salePrice, sizes }
         {/* CTA */}
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
-            variant="whatsapp"
+            variant="gold"
             size="sm"
             className="w-full"
             asChild
           >
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-              <MessageCircle className="w-4 h-4" />
-              {t('product.cta')}
-            </a>
+            <Link to={`/product/${id}`}>
+              <ShoppingCart className="w-4 h-4" />
+              {language === 'ar' ? 'اطلب الآن' : 'Commander'}
+            </Link>
           </Button>
         </motion.div>
       </div>

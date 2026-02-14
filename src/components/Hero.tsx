@@ -1,15 +1,12 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, ArrowDown } from 'lucide-react';
+import { ShoppingCart, ArrowDown } from 'lucide-react';
 import logo from '@/assets/logo.jpg';
+import heroPoster from '@/assets/products/gallery-2.jpg';
 
 const Hero = () => {
   const { t, language } = useLanguage();
-
-  const whatsappNumber = '213795443714';
-  const whatsappMessage = encodeURIComponent(t('whatsapp.greeting'));
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -19,6 +16,8 @@ const Hero = () => {
         muted
         loop
         playsInline
+        preload="metadata"
+        poster={heroPoster}
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source src="/herobackground.mp4" type="video/mp4" />
@@ -53,6 +52,11 @@ const Hero = () => {
                 src={logo}
                 alt="Classimo Logo"
                 className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                width={144}
+                height={144}
               />
             </motion.div>
           </motion.div>
@@ -92,9 +96,9 @@ const Hero = () => {
                 asChild
                 className="w-full sm:w-auto shadow-gold"
               >
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="w-5 h-5" />
-                  {t('hero.cta.primary')}
+                <a href="#catalogue">
+                  <ShoppingCart className="w-5 h-5" />
+                  {language === 'ar' ? 'اطلب الآن' : 'Commander maintenant'}
                 </a>
               </Button>
             </motion.div>
@@ -106,8 +110,8 @@ const Hero = () => {
                 asChild
                 className="w-full sm:w-auto border-foreground/20 dark:border-white/20 text-foreground dark:text-white hover:bg-foreground/5 dark:hover:bg-white/10 backdrop-blur-sm"
               >
-                <a href="#catalogue">
-                  {t('hero.cta.secondary')}
+                <a href="/contact">
+                  {language === 'ar' ? 'الدعم والمساعدة' : 'Support & Assistance'}
                 </a>
               </Button>
             </motion.div>

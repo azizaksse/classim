@@ -19,13 +19,6 @@ const Navbar = () => {
     { key: 'nav.contact', path: '/contact' },
   ];
 
-  const whatsappNumber = '213795443714';
-  const whatsappMessage = encodeURIComponent(
-    language === 'ar'
-      ? 'السلام عليكم، نحب نحجز كوستيم'
-      : 'Bonjour, je souhaite réserver un costume'
-  );
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -57,18 +50,14 @@ const Navbar = () => {
           <div className="grid grid-cols-3 items-center h-14 md:h-16">
             {/* Actions - Left in LTR, Right in RTL */}
             <div className="flex items-center gap-2 md:gap-3 justify-start">
-              {/* WhatsApp CTA - Desktop */}
-              <motion.a
-                href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-3 md:px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span className="hidden lg:inline">{language === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
-              </motion.a>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button asChild size="sm" variant="outline" className="hidden sm:flex rounded-xl">
+                  <Link to="/contact" className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    <span className="hidden lg:inline">{language === 'ar' ? 'الدعم' : 'Support'}</span>
+                  </Link>
+                </Button>
+              </motion.div>
 
               {/* Theme Toggle */}
               <ThemeToggle />
@@ -97,7 +86,15 @@ const Navbar = () => {
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.2 }}
               >
-                <img src={logo} alt="Classimo Logo" className="w-full h-full object-cover" />
+                <img
+                  src={logo}
+                  alt="Classimo Logo"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  width={44}
+                  height={44}
+                />
               </motion.div>
               <span className={`hidden sm:block text-xl md:text-2xl font-extrabold text-gradient-gold drop-shadow-sm ${dir === 'rtl' ? 'font-arabic' : 'font-display'}`}>
                 {language === 'ar' ? 'كلاسيمو' : 'Classimo'}
@@ -196,20 +193,20 @@ const Navbar = () => {
                     </motion.div>
                   ))}
 
-                  {/* WhatsApp CTA - Mobile */}
-                  <motion.a
-                    href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-4 py-3 rounded-xl font-medium transition-all duration-300"
+                  <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
                   >
+                    <Link
+                      to="/contact"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-foreground px-4 py-3 rounded-xl font-medium transition-all duration-300"
+                    >
                     <MessageCircle className="w-5 h-5" />
-                    {language === 'ar' ? 'تواصل عبر واتساب' : 'Contacter via WhatsApp'}
-                  </motion.a>
+                    {language === 'ar' ? 'الدعم والمساعدة' : 'Support & Assistance'}
+                    </Link>
+                  </motion.div>
                 </div>
               </motion.div>
             )}
