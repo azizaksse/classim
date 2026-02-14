@@ -53,19 +53,19 @@ const Dashboard = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-8 animate-fade-in">
+      <div className="space-y-6 md:space-y-8 animate-fade-in">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-heading font-semibold tracking-tight">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <h1 className="text-2xl font-heading font-semibold tracking-tight sm:text-3xl">
             Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
             Welcome back! Here's what's happening with your store.
           </p>
         </div>
 
         {/* Metrics Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="Total Products"
             value={productsLoading ? "..." : products.length.toString()}
@@ -89,7 +89,7 @@ const Dashboard = () => {
         </div>
 
         {/* Charts Row */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 xl:grid-cols-3">
           <div className="lg:col-span-2">
             <RevenueChart
               categories={categories}

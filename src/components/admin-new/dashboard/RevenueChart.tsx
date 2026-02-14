@@ -31,8 +31,8 @@ export function RevenueChart({ categories, products, isLoading }: CategoryBreakd
   const maxCount = Math.max(1, ...counts.map((c) => c.count));
 
   return (
-    <div className="card-luxury p-6">
-      <div className="mb-6">
+    <div className="card-luxury p-4 sm:p-5 lg:p-6">
+      <div className="mb-4 sm:mb-6">
         <h3 className="font-heading text-lg font-semibold">
           Products by Category
         </h3>

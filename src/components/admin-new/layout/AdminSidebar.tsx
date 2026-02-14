@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,10 +7,10 @@ import {
   Users,
   Settings,
   ChevronLeft,
-  ChevronRight,
   Crown,
   LogOut,
   Bell,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,8 +32,20 @@ const navItems = [
   { title: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
-export function AdminSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+interface AdminSidebarProps {
+  mobileOpen: boolean;
+  onMobileClose: () => void;
+  collapsed: boolean;
+  setCollapsed: (value: boolean) => void;
+}
+
+export function AdminSidebar({
+  mobileOpen,
+  onMobileClose,
+  collapsed,
+  setCollapsed,
+}: AdminSidebarProps) {
+  const isCollapsed = collapsed && !mobileOpen;
   const location = useLocation();
   const { user, signOut } = useAuth();
 
@@ -42,7 +53,7 @@ export function AdminSidebar() {
     user?.user_metadata?.full_name ||
     user?.email?.split("@")[0] ||
     "Admin";
-  const displayEmail = user?.email || "—";
+  const displayEmail = user?.email || "-";
   const initials = displayName
     .split(" ")
     .map((n: string) => n[0])
@@ -53,18 +64,20 @@ export function AdminSidebar() {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-card border-r border-border transition-all duration-300 ease-out",
-        collapsed ? "w-20" : "w-64"
+        "fixed left-0 top-0 z-50 h-screen border-r border-border bg-card transition-all duration-300 ease-out",
+        "w-72 -translate-x-full lg:translate-x-0",
+        mobileOpen && "translate-x-0",
+        "lg:z-40",
+        isCollapsed ? "lg:w-20" : "lg:w-64"
       )}
     >
       <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
-          <div className={cn("flex items-center gap-3 overflow-hidden", collapsed && "justify-center")}>
+        <div className="flex h-16 items-center justify-between border-b border-border px-4">
+          <div className={cn("flex items-center gap-3 overflow-hidden", isCollapsed && "justify-center")}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
               <Crown className="h-5 w-5 text-accent-foreground" />
             </div>
-            {!collapsed && (
+            {!isCollapsed && (
               <div className="animate-fade-in">
                 <h1 className="font-heading text-lg font-semibold text-card-foreground">
                   Classimo
@@ -73,37 +86,44 @@ export function AdminSidebar() {
               </div>
             )}
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onMobileClose}
+            className="lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="h-5 w-5" />
+          </Button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-4">
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.href;
-            const NavItem = (
+            const navItem = (
               <NavLink
                 key={item.href}
                 to={item.href}
+                onClick={onMobileClose}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   "hover:bg-accent hover:text-accent-foreground",
                   isActive
-                    ? "bg-accent text-accent-foreground border-l-2 border-accent"
+                    ? "border-l-2 border-accent bg-accent text-accent-foreground"
                     : "text-card-foreground",
-                  collapsed && "justify-center px-2"
+                  isCollapsed && "justify-center px-2"
                 )}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-accent-foreground")} />
-                {!collapsed && (
-                  <span className="animate-fade-in">{item.title}</span>
-                )}
+                {!isCollapsed && <span className="animate-fade-in">{item.title}</span>}
               </NavLink>
             );
 
-            if (collapsed) {
+            if (isCollapsed) {
               return (
                 <Tooltip key={item.href} delayDuration={0}>
-                  <TooltipTrigger asChild>{NavItem}</TooltipTrigger>
+                  <TooltipTrigger asChild>{navItem}</TooltipTrigger>
                   <TooltipContent side="right" className="font-medium">
                     {item.title}
                   </TooltipContent>
@@ -111,18 +131,17 @@ export function AdminSidebar() {
               );
             }
 
-            return NavItem;
+            return navItem;
           })}
         </nav>
 
         <Separator className="mx-3" />
 
-        {/* User Profile */}
         <div className="p-4">
           <div
             className={cn(
               "flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-accent",
-              collapsed && "justify-center"
+              isCollapsed && "justify-center"
             )}
           >
             <Avatar className="h-10 w-10 border-2 border-accent/20">
@@ -134,54 +153,48 @@ export function AdminSidebar() {
                 {initials}
               </AvatarFallback>
             </Avatar>
-            {!collapsed && (
+            {!isCollapsed && (
               <div className="flex-1 animate-fade-in">
-                <p className="text-sm font-medium text-card-foreground">
-                  {displayName}
-                </p>
+                <p className="text-sm font-medium text-card-foreground">{displayName}</p>
                 <p className="text-xs text-muted-foreground">{displayEmail}</p>
               </div>
             )}
           </div>
 
-          {!collapsed && (
+          {!isCollapsed && (
             <div className="mt-3 flex gap-2 animate-fade-in">
               <Button variant="ghost" size="sm" className="flex-1 text-muted-foreground">
-                <Bell className="h-4 w-4 mr-2" />
+                <Bell className="mr-2 h-4 w-4" />
                 Alerts
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 className="flex-1 text-muted-foreground"
-                onClick={() => signOut()}
+                onClick={() => {
+                  signOut();
+                  onMobileClose();
+                }}
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
             </div>
           )}
         </div>
 
-        {/* Collapse Button */}
-        <div className="border-t border-border p-3">
+        <div className="hidden border-t border-border p-3 lg:block">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setCollapsed(!collapsed)}
             className={cn(
               "w-full justify-center text-muted-foreground hover:text-foreground",
-              !collapsed && "justify-start"
+              !isCollapsed && "justify-start"
             )}
           >
-            {collapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <>
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                <span>Collapse</span>
-              </>
-            )}
+            <ChevronLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
+            {!isCollapsed && <span>Collapse</span>}
           </Button>
         </div>
       </div>

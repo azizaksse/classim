@@ -18,8 +18,8 @@ export function TopProducts({ products, isLoading }: TopProductsProps) {
   const top = sorted.slice(0, 4);
 
   return (
-    <div className="card-luxury p-6">
-      <div className="mb-6">
+    <div className="card-luxury p-4 sm:p-5 lg:p-6">
+      <div className="mb-4 sm:mb-6">
         <h3 className="font-heading text-lg font-semibold">Latest Products</h3>
         <p className="text-sm text-muted-foreground">
           Recently added or featured products
@@ -32,11 +32,11 @@ export function TopProducts({ products, isLoading }: TopProductsProps) {
           No products yet
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {top.map((product, index) => (
             <div
               key={product._id || product.id || `${product.name_fr}-${index}`}
-              className="flex items-center gap-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors group animate-fade-in"
+              className="flex items-center gap-3 p-2.5 sm:gap-4 sm:p-3 rounded-lg hover:bg-secondary/30 transition-colors group animate-fade-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="h-14 w-14 rounded-lg bg-secondary overflow-hidden">

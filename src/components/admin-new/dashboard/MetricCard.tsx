@@ -25,14 +25,14 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "card-luxury p-6 hover-lift group",
+        "card-luxury p-4 sm:p-5 lg:p-6 hover-lift group",
         className
       )}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-heading font-semibold tracking-tight">
+          <p className="text-2xl font-heading font-semibold tracking-tight sm:text-3xl">
             {value}
           </p>
           {change !== undefined && (

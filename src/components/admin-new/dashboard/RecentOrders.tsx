@@ -20,8 +20,8 @@ const formatDate = (value: string) => {
 
 export function RecentCustomers({ customers, isLoading }: RecentCustomersProps) {
   return (
-    <div className="card-luxury p-6">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="card-luxury p-4 sm:p-5 lg:p-6">
+      <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div>
           <h3 className="font-heading text-lg font-semibold">
             Recent Customers
@@ -44,11 +44,11 @@ export function RecentCustomers({ customers, isLoading }: RecentCustomersProps) 
           No customers yet
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {customers.map((customer, index) => (
             <div
               key={customer.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors animate-fade-in"
+              className="flex items-center justify-between gap-3 rounded-lg bg-secondary/30 p-2.5 transition-colors hover:bg-secondary/50 animate-fade-in sm:p-3"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="flex items-center gap-4">
