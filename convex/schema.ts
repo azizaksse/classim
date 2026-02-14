@@ -10,6 +10,9 @@ export default defineSchema({
         announcement_enabled: v.optional(v.boolean()),
         announcement_text_ar: v.optional(v.string()),
         announcement_text_fr: v.optional(v.string()),
+        hero_brand_text: v.optional(v.string()),
+        hero_title_text: v.optional(v.string()),
+        hero_subtitle_text: v.optional(v.string()),
         updated_at: v.optional(v.string()),
     }).index("by_key", ["key"]),
     categories: defineTable({

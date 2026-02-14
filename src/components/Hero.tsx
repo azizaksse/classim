@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion';
+import { useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, ArrowDown } from 'lucide-react';
@@ -7,6 +9,10 @@ import heroPoster from '@/assets/products/gallery-2.jpg';
 
 const Hero = () => {
   const { t, language } = useLanguage();
+  const storeSettings = useQuery(api.settings.get);
+  const heroBrand = (storeSettings?.hero_brand_text || "Classimo").trim();
+  const heroTitle = (storeSettings?.hero_title_text || t('hero.title')).trim();
+  const heroSubtitle = (storeSettings?.hero_subtitle_text || t('hero.subtitle')).trim();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -50,7 +56,7 @@ const Hero = () => {
             >
               <img
                 src={logo}
-                alt="Classimo Logo"
+                alt={`${heroBrand} Logo`}
                 className="w-full h-full object-cover"
                 loading="eager"
                 decoding="async"
@@ -62,6 +68,15 @@ const Hero = () => {
           </motion.div>
 
           {/* Title */}
+          <motion.p
+            className="mb-3 text-sm md:text-base font-semibold uppercase tracking-[0.22em] text-primary"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+          >
+            {heroBrand}
+          </motion.p>
+
           <motion.h1
             className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-6 ${language === 'ar' ? 'font-arabic' : 'font-display'
               } text-foreground dark:text-white`}
@@ -69,7 +84,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <span className="drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)] dark:drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">{t('hero.title')}</span>
+            <span className="drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)] dark:drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">{heroTitle}</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -79,7 +94,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {t('hero.subtitle')}
+            {heroSubtitle}
           </motion.p>
 
           {/* CTAs */}

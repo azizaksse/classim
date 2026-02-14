@@ -28,6 +28,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { WILAYAS } from "@/constants/wilayas";
 
+const DEFAULT_HERO_BRAND = "Classimo";
+const DEFAULT_HERO_TITLE = "Location & Vente de Costumes de Mariage";
+const DEFAULT_HERO_SUBTITLE = "Modeles premium • Tailles variees • Commande rapide et securisee";
+
 const Settings = () => {
   const { toast } = useToast();
   const storeSettings = useQuery(api.settings.get);
@@ -38,6 +42,9 @@ const Settings = () => {
   const [announcementEnabled, setAnnouncementEnabled] = useState(false);
   const [announcementTextAr, setAnnouncementTextAr] = useState("");
   const [announcementTextFr, setAnnouncementTextFr] = useState("");
+  const [heroBrandText, setHeroBrandText] = useState("");
+  const [heroTitleText, setHeroTitleText] = useState("");
+  const [heroSubtitleText, setHeroSubtitleText] = useState("");
 
   useEffect(() => {
     if (storeSettings) {
@@ -52,6 +59,9 @@ const Settings = () => {
       setAnnouncementEnabled(Boolean(storeSettings.announcement_enabled));
       setAnnouncementTextAr(storeSettings.announcement_text_ar ?? "");
       setAnnouncementTextFr(storeSettings.announcement_text_fr ?? "");
+      setHeroBrandText((storeSettings.hero_brand_text ?? "").trim() || DEFAULT_HERO_BRAND);
+      setHeroTitleText((storeSettings.hero_title_text ?? "").trim() || DEFAULT_HERO_TITLE);
+      setHeroSubtitleText((storeSettings.hero_subtitle_text ?? "").trim() || DEFAULT_HERO_SUBTITLE);
     }
   }, [storeSettings]);
 
@@ -110,10 +120,13 @@ const Settings = () => {
         announcement_enabled: announcementEnabled,
         announcement_text_ar: announcementTextAr.trim(),
         announcement_text_fr: announcementTextFr.trim(),
+        hero_brand_text: heroBrandText.trim(),
+        hero_title_text: heroTitleText.trim(),
+        hero_subtitle_text: heroSubtitleText.trim(),
       });
       toast({
         title: "Settings saved",
-        description: "Delivery prices and Facebook Pixel settings have been updated.",
+        description: "Store and homepage settings have been updated.",
       });
     } catch (error: any) {
       toast({
@@ -371,6 +384,44 @@ const Settings = () => {
                         onChange={(e) => setAnnouncementTextFr(e.target.value)}
                         className="input-luxury"
                         placeholder="📦 Livraison vers toutes les wilayas DZ"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">Homepage Hero Text</h4>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="hero_brand_text">Logo Label</Label>
+                      <Input
+                        id="hero_brand_text"
+                        value={heroBrandText}
+                        onChange={(e) => setHeroBrandText(e.target.value)}
+                        className="input-luxury"
+                        placeholder="Classimo"
+                      />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="hero_title_text">Hero Title</Label>
+                      <Input
+                        id="hero_title_text"
+                        value={heroTitleText}
+                        onChange={(e) => setHeroTitleText(e.target.value)}
+                        className="input-luxury"
+                        placeholder="Location & Vente de Costumes de Mariage"
+                      />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="hero_subtitle_text">Hero Subtitle</Label>
+                      <Textarea
+                        id="hero_subtitle_text"
+                        value={heroSubtitleText}
+                        onChange={(e) => setHeroSubtitleText(e.target.value)}
+                        className="input-luxury min-h-[90px]"
+                        placeholder="Modeles premium • Tailles variees • Commande rapide et securisee"
                       />
                     </div>
                   </div>

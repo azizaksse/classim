@@ -18,6 +18,9 @@ export const get = query({
             announcement_enabled: settings?.announcement_enabled ?? false,
             announcement_text_ar: settings?.announcement_text_ar ?? "",
             announcement_text_fr: settings?.announcement_text_fr ?? "",
+            hero_brand_text: settings?.hero_brand_text ?? "",
+            hero_title_text: settings?.hero_title_text ?? "",
+            hero_subtitle_text: settings?.hero_subtitle_text ?? "",
             updated_at: settings?.updated_at ?? null,
         };
     },
@@ -58,6 +61,9 @@ export const upsertStoreSettings = mutation({
         announcement_enabled: v.optional(v.boolean()),
         announcement_text_ar: v.optional(v.string()),
         announcement_text_fr: v.optional(v.string()),
+        hero_brand_text: v.optional(v.string()),
+        hero_title_text: v.optional(v.string()),
+        hero_subtitle_text: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const existing = await ctx.db
@@ -72,6 +78,9 @@ export const upsertStoreSettings = mutation({
             announcement_enabled?: boolean;
             announcement_text_ar?: string;
             announcement_text_fr?: string;
+            hero_brand_text?: string;
+            hero_title_text?: string;
+            hero_subtitle_text?: string;
             updated_at: string;
         } = {
             updated_at: new Date().toISOString(),
@@ -96,6 +105,15 @@ export const upsertStoreSettings = mutation({
         if (args.announcement_text_fr !== undefined) {
             updates.announcement_text_fr = args.announcement_text_fr;
         }
+        if (args.hero_brand_text !== undefined) {
+            updates.hero_brand_text = args.hero_brand_text;
+        }
+        if (args.hero_title_text !== undefined) {
+            updates.hero_title_text = args.hero_title_text;
+        }
+        if (args.hero_subtitle_text !== undefined) {
+            updates.hero_subtitle_text = args.hero_subtitle_text;
+        }
 
         if (existing) {
             await ctx.db.patch(existing._id, updates);
@@ -110,6 +128,9 @@ export const upsertStoreSettings = mutation({
             announcement_enabled: args.announcement_enabled ?? false,
             announcement_text_ar: args.announcement_text_ar ?? "",
             announcement_text_fr: args.announcement_text_fr ?? "",
+            hero_brand_text: args.hero_brand_text ?? "",
+            hero_title_text: args.hero_title_text ?? "",
+            hero_subtitle_text: args.hero_subtitle_text ?? "",
             updated_at: new Date().toISOString(),
         });
     },
