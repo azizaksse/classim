@@ -63,6 +63,15 @@ const ProductCard = ({
         )}
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {hasDiscount && (
+          <span
+            className={`absolute top-3 z-10 rounded-md bg-destructive px-2.5 py-1 text-sm font-bold text-destructive-foreground shadow-sm ${
+              language === 'ar' ? 'left-3' : 'right-3'
+            }`}
+          >
+            -{salePercentage}%
+          </span>
+        )}
       </Link>
 
       {/* Content */}
@@ -91,9 +100,6 @@ const ProductCard = ({
             <>
               <span className="text-xs line-through text-muted-foreground">
                 {Number(originalPrice).toLocaleString()} {language === 'ar' ? 'دج' : 'DA'}
-              </span>
-              <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
-                -{salePercentage}%
               </span>
             </>
           )}
