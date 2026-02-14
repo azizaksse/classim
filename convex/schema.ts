@@ -7,6 +7,9 @@ export default defineSchema({
         delivery_price: v.float64(),
         delivery_prices_by_wilaya: v.optional(v.record(v.string(), v.float64())),
         facebook_pixels: v.optional(v.array(v.string())),
+        announcement_enabled: v.optional(v.boolean()),
+        announcement_text_ar: v.optional(v.string()),
+        announcement_text_fr: v.optional(v.string()),
         updated_at: v.optional(v.string()),
     }).index("by_key", ["key"]),
     categories: defineTable({

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Globe, MessageCircle } from 'lucide-react';
@@ -12,6 +14,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const storeSettings = useQuery(api.settings.get);
 
   const navLinks = [
     { key: 'nav.home', path: '/' },
@@ -32,20 +35,38 @@ const Navbar = () => {
   };
 
   const isActive = (path: string) => location.pathname === path;
+  const announcementTextRaw = language === 'ar'
+    ? (storeSettings?.announcement_text_ar || storeSettings?.announcement_text_fr || "")
+    : (storeSettings?.announcement_text_fr || storeSettings?.announcement_text_ar || "");
+  const announcementText = announcementTextRaw.trim();
+  const showAnnouncement = Boolean(storeSettings?.announcement_enabled && announcementText);
+  const announcementItems = [announcementText, announcementText, announcementText];
 
   return (
-    <motion.nav
-      className="fixed top-3 md:top-4 inset-x-0 z-50 px-3 md:px-4"
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-    >
-      <div
-        className={`mx-auto w-full max-w-4xl transition-all duration-500 ${scrolled
-          ? 'bg-card/95 shadow-elegant border border-border/60'
-          : 'bg-card/80 border border-border/40'
-          } backdrop-blur-xl rounded-2xl`}
+    <>
+      {showAnnouncement && (
+        <div className="fixed inset-x-0 top-0 z-[55] overflow-hidden border-b border-[#3d3228] bg-[#1a1510] text-[#f9edda]">
+          <div className="announcement-track flex min-w-max items-center gap-10 py-1.5 text-xs font-semibold">
+            {[...announcementItems, ...announcementItems].map((item, index) => (
+              <span key={`${item}-${index}`} className="whitespace-nowrap opacity-95">
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      <motion.nav
+        className={`fixed inset-x-0 z-50 px-3 md:px-4 ${showAnnouncement ? "top-9 md:top-10" : "top-3 md:top-4"}`}
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
+        <div
+          className={`mx-auto w-full max-w-4xl transition-all duration-500 ${scrolled
+            ? 'bg-card/95 shadow-elegant border border-border/60'
+            : 'bg-card/80 border border-border/40'
+            } backdrop-blur-xl rounded-2xl`}
+        >
         <div className="px-4 md:px-6">
           <div className="grid grid-cols-3 items-center h-14 md:h-16">
             {/* Actions - Left in LTR, Right in RTL */}
@@ -212,8 +233,9 @@ const Navbar = () => {
             )}
           </AnimatePresence>
         </div>
-      </div>
-    </motion.nav>
+        </div>
+      </motion.nav>
+    </>
   );
 };
 

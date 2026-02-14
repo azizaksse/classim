@@ -15,6 +15,9 @@ export const get = query({
             delivery_price: settings?.delivery_price ?? 0,
             delivery_prices_by_wilaya: settings?.delivery_prices_by_wilaya ?? {},
             facebook_pixels: settings?.facebook_pixels ?? [],
+            announcement_enabled: settings?.announcement_enabled ?? false,
+            announcement_text_ar: settings?.announcement_text_ar ?? "",
+            announcement_text_fr: settings?.announcement_text_fr ?? "",
             updated_at: settings?.updated_at ?? null,
         };
     },
@@ -52,6 +55,9 @@ export const upsertStoreSettings = mutation({
         delivery_price: v.optional(v.number()),
         delivery_prices_by_wilaya: v.optional(v.record(v.string(), v.number())),
         facebook_pixels: v.optional(v.array(v.string())),
+        announcement_enabled: v.optional(v.boolean()),
+        announcement_text_ar: v.optional(v.string()),
+        announcement_text_fr: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const existing = await ctx.db
@@ -63,6 +69,9 @@ export const upsertStoreSettings = mutation({
             delivery_price?: number;
             delivery_prices_by_wilaya?: Record<string, number>;
             facebook_pixels?: string[];
+            announcement_enabled?: boolean;
+            announcement_text_ar?: string;
+            announcement_text_fr?: string;
             updated_at: string;
         } = {
             updated_at: new Date().toISOString(),
@@ -78,6 +87,15 @@ export const upsertStoreSettings = mutation({
         if (args.delivery_prices_by_wilaya !== undefined) {
             updates.delivery_prices_by_wilaya = args.delivery_prices_by_wilaya;
         }
+        if (args.announcement_enabled !== undefined) {
+            updates.announcement_enabled = args.announcement_enabled;
+        }
+        if (args.announcement_text_ar !== undefined) {
+            updates.announcement_text_ar = args.announcement_text_ar;
+        }
+        if (args.announcement_text_fr !== undefined) {
+            updates.announcement_text_fr = args.announcement_text_fr;
+        }
 
         if (existing) {
             await ctx.db.patch(existing._id, updates);
@@ -89,6 +107,9 @@ export const upsertStoreSettings = mutation({
             delivery_price: args.delivery_price ?? 0,
             delivery_prices_by_wilaya: args.delivery_prices_by_wilaya ?? {},
             facebook_pixels: args.facebook_pixels ?? [],
+            announcement_enabled: args.announcement_enabled ?? false,
+            announcement_text_ar: args.announcement_text_ar ?? "",
+            announcement_text_fr: args.announcement_text_fr ?? "",
             updated_at: new Date().toISOString(),
         });
     },

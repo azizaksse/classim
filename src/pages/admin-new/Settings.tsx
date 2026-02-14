@@ -35,6 +35,9 @@ const Settings = () => {
   const [deliveryPrice, setDeliveryPrice] = useState("0");
   const [deliveryPricesByWilaya, setDeliveryPricesByWilaya] = useState<Record<string, string>>({});
   const [facebookPixelsText, setFacebookPixelsText] = useState("");
+  const [announcementEnabled, setAnnouncementEnabled] = useState(false);
+  const [announcementTextAr, setAnnouncementTextAr] = useState("");
+  const [announcementTextFr, setAnnouncementTextFr] = useState("");
 
   useEffect(() => {
     if (storeSettings) {
@@ -46,6 +49,9 @@ const Settings = () => {
       }
       setDeliveryPricesByWilaya(mappedValues);
       setFacebookPixelsText((storeSettings.facebook_pixels ?? []).join("\n"));
+      setAnnouncementEnabled(Boolean(storeSettings.announcement_enabled));
+      setAnnouncementTextAr(storeSettings.announcement_text_ar ?? "");
+      setAnnouncementTextFr(storeSettings.announcement_text_fr ?? "");
     }
   }, [storeSettings]);
 
@@ -101,6 +107,9 @@ const Settings = () => {
         delivery_price: parsedPrice,
         delivery_prices_by_wilaya: parsedByWilaya,
         facebook_pixels: facebookPixels,
+        announcement_enabled: announcementEnabled,
+        announcement_text_ar: announcementTextAr.trim(),
+        announcement_text_fr: announcementTextFr.trim(),
       });
       toast({
         title: "Settings saved",
@@ -326,6 +335,44 @@ const Settings = () => {
                     <p className="text-xs text-muted-foreground">
                       Add multiple Facebook Pixel IDs to track all client ad accounts.
                     </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h4 className="font-medium">Announcement Bar</h4>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">Show top announcement line</p>
+                      <p className="text-sm text-muted-foreground">
+                        Display a line above the navbar on all website pages.
+                      </p>
+                    </div>
+                    <Switch checked={announcementEnabled} onCheckedChange={setAnnouncementEnabled} />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="announcement_text_ar">Text (Arabic)</Label>
+                      <Input
+                        id="announcement_text_ar"
+                        value={announcementTextAr}
+                        onChange={(e) => setAnnouncementTextAr(e.target.value)}
+                        className="input-luxury"
+                        dir="rtl"
+                        placeholder="📦 التوصيل لجميع الولايات dz"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="announcement_text_fr">Text (French)</Label>
+                      <Input
+                        id="announcement_text_fr"
+                        value={announcementTextFr}
+                        onChange={(e) => setAnnouncementTextFr(e.target.value)}
+                        className="input-luxury"
+                        placeholder="📦 Livraison vers toutes les wilayas DZ"
+                      />
+                    </div>
                   </div>
                 </div>
 
